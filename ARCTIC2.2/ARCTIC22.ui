@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ARCTIC22Class</class>
+ <widget class="QMainWindow" name="ARCTIC22Class">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1065</width>
+    <height>717</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ARCTIC22</string>
+  </property>
+  <widget class="QWidget" name="MainLayout">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="RendererTabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="PlayTabWidget">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="Debug">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1065</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTool">
+    <property name="title">
+     <string>Tool</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuTool"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionTransformPosition"/>
+   <addaction name="actionTransformRotation"/>
+   <addaction name="actionTransformScale"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="MenuDock">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>300</width>
+     <height>38</height>
+    </size>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents"/>
+  </widget>
+  <action name="actionTransformPosition">
+   <property name="text">
+    <string>Position</string>
+   </property>
+   <property name="shortcut">
+    <string>P</string>
+   </property>
+  </action>
+  <action name="actionTransformRotation">
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="actionTransformScale">
+   <property name="text">
+    <string>Scale</string>
+   </property>
+   <property name="shortcut">
+    <string>S</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="ARCTIC22.qrc"/>
+ </resources>
+ <connections/>
+</ui>

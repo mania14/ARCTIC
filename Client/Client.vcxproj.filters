@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\GameObject">
+      <UniqueIdentifier>{3db1a11e-7f08-4937-af8f-b65b6b96cff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Scene">
+      <UniqueIdentifier>{ce47e638-8712-4c85-b87e-4172cc8645db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Camera">
+      <UniqueIdentifier>{5e26d899-adc3-43ec-81ee-31125057f9d9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Box.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="AlphaScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="MirrorScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolCamera.h">
+      <Filter>소스 파일\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="MirrorCamera.h">
+      <Filter>소스 파일\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeBillboardScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="TestCalcShaderScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceObject.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolCommand.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolTransformManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LightObject.h">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurScene.h">
+      <Filter>소스 파일\Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Box.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="AlphaScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolCamera.cpp">
+      <Filter>소스 파일\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorCamera.cpp">
+      <Filter>소스 파일\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeBillboardScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="TestCalcShaderScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="InstanceScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="InstanceObject.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolTransformManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolCommand.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LightObject.cpp">
+      <Filter>소스 파일\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="BlurScene.cpp">
+      <Filter>소스 파일\Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Client.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

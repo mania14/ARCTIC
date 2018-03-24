@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\Renderer">
+      <UniqueIdentifier>{318f98ba-f896-4488-8cf2-06586839563a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Timer">
+      <UniqueIdentifier>{9aa70b7b-a932-4152-8bcf-14a85902c6ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Input">
+      <UniqueIdentifier>{36c0ef48-893e-4bfc-aa0b-f7260c8a8877}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\FileIO">
+      <UniqueIdentifier>{89487b89-f006-4cde-952a-2d5d80590b4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\FX">
+      <UniqueIdentifier>{62e2df60-2c5d-46d5-85e8-36da9db1cab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Thread">
+      <UniqueIdentifier>{d9661213-f574-4455-8840-7834822a9789}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexDesc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FXManager.h">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderDevice.h">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Inputmanager.h">
+      <Filter>소스 파일\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstBufferDesc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>소스 파일\FileIO</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderState.h">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomManager.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>소스 파일\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadWorker.h">
+      <Filter>소스 파일\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Shape.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderDevice.cpp">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="FXManager.cpp">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>소스 파일\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>소스 파일\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>소스 파일\FileIO</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderState.cpp">
+      <Filter>소스 파일\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadWorker.cpp">
+      <Filter>소스 파일\Thread</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Res\fx\Blur.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\DefaultBillboard.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\DefaultLight.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\DefaultLightFunc.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\RenderTarget.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\Sky.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\TestCalc.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\TerrainMaker.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\Utill.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\Debug.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Res\fx\GBuffer.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
