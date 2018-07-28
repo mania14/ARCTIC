@@ -21,7 +21,7 @@ public:
 	T*		GetComponent( int index = 0)
 	{
 		// 임시 나중에 페러펀스로 바꾸자
-		return static_cast<T*>(_vecComponent[T::COMPONENTID][index]);
+		return !_vecComponent[T::COMPONENTID].empty() ? static_cast<T*>(_vecComponent[T::COMPONENTID][index]) : nullptr;
 	}
 	//void	DeleteComponent();
 

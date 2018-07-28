@@ -33,17 +33,17 @@ bool CameraManager::SetCurrentCamera(const std::string CamName)
 	}
 }
 
-const XMMATRIX & CameraManager::GetCurrentCameraViewProj()
+const acm::float4x4 & CameraManager::GetCurrentCameraViewProj()
 {
 	return _CurrentCamera->GetViewProj();
 }
 
-const XMMATRIX & CameraManager::GetCurrentCameraProj()
+const acm::float4x4 & CameraManager::GetCurrentCameraProj()
 {
 	return _CurrentCamera->GetProj();
 }
 
-const XMMATRIX & CameraManager::GetCurrentCameraView()
+const acm::float4x4 & CameraManager::GetCurrentCameraView()
 {
 	return _CurrentCamera->GetView();
 }
@@ -54,16 +54,12 @@ void CameraManager::Release()
 
 }
 
-const XMFLOAT3 CameraManager::GetCurrentCameraPosition()
+const acm::float3 CameraManager::GetCurrentCameraPosition()
 {
-	XMFLOAT3 temp;
-	XMStoreFloat3(&temp, _CurrentCamera->GetPosition());
-	return temp;
+	return _CurrentCamera->GetPosition();
 }
 
-const XMFLOAT3 CameraManager::GetCurrentCameraDirection()
+const acm::float3 CameraManager::GetCurrentCameraDirection()
 {
-	XMFLOAT3 temp;
-	XMStoreFloat3(&temp, XMVector3Normalize(_CurrentCamera->GetAt()));
-	return temp;
+	return _CurrentCamera->GetAt();
 }

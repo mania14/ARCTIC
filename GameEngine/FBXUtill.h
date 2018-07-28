@@ -14,7 +14,7 @@ public:
 	bool Release();
 	FbxScene* ImportFBXScene(const char* FileName);
 	void      ReadFBXUVData(FbxMesh* pFbxMesh, Mesh* pMesh);
-	void      ReadFBXNormalData(FbxGeometryElementNormal* pElement, XMFLOAT3* pData);
+	void      ReadFBXNormalData(FbxGeometryElementNormal* pElement, acm::float3* pData);
 	void      ReadFBXMaterialData(FbxMesh* pFbxMesh, Mesh* pMesh);
 
 private:

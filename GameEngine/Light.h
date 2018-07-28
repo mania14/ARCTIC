@@ -26,25 +26,25 @@ public:
 		return COMPONENTID;
 	};
 
-	void					SetAmbient(const XMFLOAT4 ambient) {
+	void					SetAmbient(const acm::float4& ambient) {
 		_LightBuffer._ambient = ambient;
 	};
-	void					SetSpecular(const XMFLOAT4 specular) {
+	void					SetSpecular(const acm::float4& specular) {
 		_LightBuffer._specular = specular;
 	};
-	void					SetDiffuse(const XMFLOAT4 diffuse) {
+	void					SetDiffuse(const acm::float4& diffuse) {
 		_LightBuffer._diffuse = diffuse;
 	};
-	void					SetAttenuation(XMFLOAT3 attenuation) {
+	void					SetAttenuation(const acm::float3& attenuation) {
 		_LightBuffer._attenuation = attenuation;
 	};
-	void					SetSpot(float spot) {
+	void					SetSpot(const float spot) {
 		_LightBuffer._spot = spot;
 	};
-	void					SetPosition(XMFLOAT3 position) {
+	void					SetPosition(const acm::float3& position) {
 		_LightBuffer._position = position;
 	};
-	void					SetDirection(XMFLOAT3 direction) {
+	void					SetDirection(const acm::float3& direction) {
 		_LightBuffer._direction = direction;
 	};
 	void					SetRange(float range) {

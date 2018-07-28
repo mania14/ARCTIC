@@ -71,8 +71,8 @@ void Box::Render()
 	Mesh* pMesh = GetComponent<Mesh>();
 	Transform* pTransform = GetComponent<Transform>();
 		
-	XMMATRIX worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
-	XMMATRIX world = pTransform->GetWorldMatrix();
+	float4x4 worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
+	float4x4 world = pTransform->GetWorldMatrix();
 	
 	RenderDevice::This().Begin("PackGBufferTech");
 	{	

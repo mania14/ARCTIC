@@ -49,17 +49,19 @@ void ToolTransformManager::Update()
 			{
 				Transform* pTransform = _currentGameObject->GetComponent<Transform>();
 
-				XMMATRIX invMatViewProj = XMMatrixInverse(&XMMatrixDeterminant(CameraManager::This().GetCurrentCameraViewProj()), CameraManager::This().GetCurrentCameraViewProj());
+				float4x4 invMatViewProj = CameraManager::This().GetCurrentCameraViewProj().inverse_val();
 
 				float vx = (float)InputManager::This().GetMousePosX() / (float)RenderDevice::This().GetWidth() * 2.0f - 1.f;
 				float vy = (float)InputManager::This().GetMousePosY() / (float)RenderDevice::This().GetHeight() * -2.0f + 1.f;
 
-				XMVECTOR vPosition = XMLoadFloat3(&pTransform->GetPosition());
-				XMVECTOR vWorldPosition = XMVector3TransformCoord(vPosition, CameraManager::This().GetCurrentCameraViewProj());
-				XMVECTOR vecNewRay = XMVector3TransformCoord(XMVectorSet(vx, vy, XMVectorGetZ(vWorldPosition), 1.0f), invMatViewProj);
+				float3 vWorldPosition = acm::TransformCoord(pTransform->GetPosition(), CameraManager::This().GetCurrentCameraViewProj());
+				float3 vNewRay = acm::TransformCoord(float3(vWorldPosition.x, vWorldPosition.y, vWorldPosition.z), invMatViewProj);
+				//XMVECTOR vPosition = XMLoadFloat3(&pTransform->GetPosition());
+				//XMVECTOR vWorldPosition = XMVector3TransformCoord(vPosition, CameraManager::This().GetCurrentCameraViewProj());
+				//XMVECTOR vecNewRay = XMVector3TransformCoord(XMVectorSet(vx, vy, XMVectorGetZ(vWorldPosition), 1.0f), invMatViewProj);
 
-				XMFLOAT3 tempAxis[TOOL_TRANSFORM_AXIS_COUNT] = { XMFLOAT3(1, 0, 0), XMFLOAT3(0, 1, 0), XMFLOAT3(0, 0, 1) };
-				BoundingBox box;
+				static float3 tempAxis[TOOL_TRANSFORM_AXIS_COUNT] = { float3(1, 0, 0), float3(0, 1, 0), float3(0, 0, 1) };
+				acm::AABB box;
 				float dist;
 				float lineLength = 0.5f + 0.1f;
 				float extents = 0.1f;
@@ -73,17 +75,17 @@ void ToolTransformManager::Update()
 						{
 							case TOOL_TRANSFORM_POSITION:
 							{
-								XMFLOAT3 position = pTransform->GetPosition();
+								float3 position = pTransform->GetPosition();
 								switch (CurrentAxis)
 								{
 								case TOOL_TRANSFORM_AXIS_X:
-									position.x += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetRight())));
+									position.x += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetRight());
 									break;
 								case TOOL_TRANSFORM_AXIS_Y:
-									position.y += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetUp())));
+									position.y += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetUp());
 									break;
 								case TOOL_TRANSFORM_AXIS_Z:
-									position.z += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetLook())));
+									position.z += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetLook());
 									break;
 								}
 								pTransform->SetPosition(position);
@@ -91,17 +93,17 @@ void ToolTransformManager::Update()
 							}
 							case TOOL_TRANSFORM_ROTATE:
 							{
-								XMFLOAT3 rotate = pTransform->GetRotation();
+								float3 rotate = pTransform->GetRotation();
 								switch (CurrentAxis)
 								{
 								case TOOL_TRANSFORM_AXIS_X:
-									rotate.x += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetRight()))) * rotationWeight;
+									rotate.x += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetRight()) * rotationWeight;
 									break;
 								case TOOL_TRANSFORM_AXIS_Y:
-									rotate.y += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetUp()))) * rotationWeight;
+									rotate.y += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetUp()) * rotationWeight;
 									break;
 								case TOOL_TRANSFORM_AXIS_Z:
-									rotate.z += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetLook()))) * rotationWeight;
+									rotate.z += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetLook()) * rotationWeight;
 									break;
 								}
 								pTransform->SetRotation(rotate);
@@ -109,17 +111,17 @@ void ToolTransformManager::Update()
 							}
 							case TOOL_TRANSFORM_SCALE:
 							{
-								XMFLOAT3 scale = pTransform->GetScale();
+								float3 scale = pTransform->GetScale();
 								switch (CurrentAxis)
 								{
 								case TOOL_TRANSFORM_AXIS_X:
-									scale.x += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetRight())));
+									scale.x += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetRight());
 									break;
 								case TOOL_TRANSFORM_AXIS_Y:
-									scale.y += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetUp())));
+									scale.y += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetUp());
 									break;
 								case TOOL_TRANSFORM_AXIS_Z:
-									scale.z += XMVectorGetX(XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetLook())));
+									scale.z += acm::float3::dot(vNewRay - _vecOldRay, pTransform->GetLook());
 									break;
 								}
 								pTransform->SetRotation(scale);
@@ -140,7 +142,7 @@ void ToolTransformManager::Update()
 						box.Center.y += tempAxis[i].y * lineLength;
 						box.Center.z += tempAxis[i].z * lineLength;
 
-						box.Extents = XMFLOAT3(extents, extents, extents);
+						box.Extents = float3(extents, extents, extents);
 
 						if (PickingManager::This().RayPick(InputManager::This().GetMousePosX(), InputManager::This().GetMousePosY(), box, dist))
 						{
@@ -150,7 +152,7 @@ void ToolTransformManager::Update()
 					}
 				}
 
-				_vecOldRay = vecNewRay;
+				_vecOldRay = vNewRay;
 			}
 		}
 	}
@@ -186,11 +188,11 @@ void ToolTransformManager::CreateGizmo()
 		std::vector<Vertex_Debug> vecLine;
 
 		Vertex_Debug center;
-		center.Pos = XMFLOAT3(0, 0, 0);
+		center.Pos = float3(0, 0, 0);
 		vecLine.push_back(center);
 
 		Vertex_Debug temp;
-		temp.Pos = XMFLOAT3(0, 0, radious * 5);
+		temp.Pos = float3(0, 0, radious * 5);
 		vecLine.push_back(temp);
 
 		{
@@ -253,35 +255,35 @@ void ToolTransformManager::CreateGizmo()
 
 		std::vector<Vertex_Debug> vertices =
 		{
-			{ XMFLOAT3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
 
-			{ XMFLOAT3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
 
-			{ XMFLOAT3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
 
-			{ XMFLOAT3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
 
-			{ XMFLOAT3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(-w2, -h2, -d2 + vecLine[1].Pos.z)},
 
-			{ XMFLOAT3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
-			{ XMFLOAT3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, -d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, +h2, +d2 + vecLine[1].Pos.z)},
+			{ float3(+w2, -h2, +d2 + vecLine[1].Pos.z)},
 		};
 
 		{
@@ -310,40 +312,39 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 		UINT stride = sizeof(Vertex_Debug);
 		UINT offset = 0;
 
-		XMFLOAT4 AxisColor[TOOL_TRANSFORM_AXIS_COUNT] = { XMFLOAT4(1, 0, 0, 1), XMFLOAT4(0, 1, 0, 1), XMFLOAT4(0, 0, 1, 1) };
+		static float4 AxisColor[TOOL_TRANSFORM_AXIS_COUNT] = { float4(1, 0, 0, 1), float4(0, 1, 0, 1), float4(0, 0, 1, 1) };
 
 		if (_isClicked)
 		{
-			AxisColor[CurrentAxis] = XMFLOAT4(1, 1, 1, 1);
+			AxisColor[CurrentAxis] = float4(1, 1, 1, 1);
 		}
 
-		XMMATRIX worldviewproj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
+		float4x4 worldviewproj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
 
 		{
 			RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			RenderDevice::This().GetContext()->OMSetDepthStencilState(RenderStates::This().NoUseDepthStencilDSS, 0);
 			RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &(_pGizmo->pLineGizmoBuffer), &stride, &offset);
 
-			XMFLOAT4X4 matPosition;
-			ZeroMemory(&matPosition, sizeof(XMFLOAT4X4));
+			float4x4 matPosition;
 			matPosition._11 = 1.f; matPosition._22 = 1.f; matPosition._33 = 1.f; matPosition._44 = 1.f;
 			matPosition._41 = pTransform->GetPosition().x; matPosition._42 = pTransform->GetPosition().y; matPosition._43 = pTransform->GetPosition().z;
 
-			XMMATRIX worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(0, 0, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			float4x4 worldviewproj = matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
-			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Z], 0, sizeof(XMFLOAT3));
+			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Z], 0, sizeof(float3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
-			worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(0, DEGREE_TO_RADIAN * 90, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeQuaternionToRotateMatrix(float3(0, DEGREE_TO_RADIAN * 90, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
-			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(XMFLOAT3));
+			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(float3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
-			worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(DEGREE_TO_RADIAN * -90, 0, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
-			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(XMFLOAT3));
+			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(float3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 		}
@@ -354,24 +355,23 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 			RenderDevice::This().GetContext()->OMSetDepthStencilState(RenderStates::This().NoUseDepthStencilDSS, 0);
 			RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &(_pGizmo->pPositionGizmoBuffer), &stride, &offset);
 
-			XMFLOAT4X4 matPosition;
-			ZeroMemory(&matPosition, sizeof(XMFLOAT4X4));
+			float4x4 matPosition;
 			matPosition._11 = 1.f; matPosition._22 = 1.f; matPosition._33 = 1.f; matPosition._44 = 1.f;
 			matPosition._41 = pTransform->GetPosition().x; matPosition._42 = pTransform->GetPosition().y; matPosition._43 = pTransform->GetPosition().z;
 
-			XMMATRIX worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(0, 0, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			float4x4 worldviewproj = matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Z], 0, sizeof(XMFLOAT3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw(_pGizmo->PositionGizmoCount, 0);
 
-			worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(0, DEGREE_TO_RADIAN * 90, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(XMFLOAT3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw(_pGizmo->PositionGizmoCount, 0);
 
-			worldviewproj = DirectX::XMMatrixRotationRollPitchYaw(DEGREE_TO_RADIAN * -90, 0, 0) * XMLoadFloat4x4(&matPosition) * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(XMFLOAT3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());

@@ -27,10 +27,10 @@ void Camera::Create()
 	_Near = 0.1f;
 	_Far = 10000.f;
 
-	const XMFLOAT3 vZero(0.f, 0.f, 0.f);
-	_vEye = XMLoadFloat3(&XMFLOAT3(0.f, 0.f, -10.f));
-	_vAt = XMLoadFloat3(&vZero);
-	_vUp = XMLoadFloat3(&POSITIVE_Y);
+	const acm::float3 vZero(0.f, 0.f, 0.f);
+	_vEye = acm::float3(0.f, 0.f, -10.f);
+	_vAt = acm::float3(0.f, 0.f, 0.f);
+	_vUp = POSITIVE_Y;
 
 	Transform* pTransform = new Transform();
 	pTransform->Init();
@@ -43,12 +43,12 @@ void Camera::Update()
 
 	Transform* pTransform = GetComponent<Transform>();
 
-	_vEye = XMLoadFloat3(&pTransform->GetPosition());
-	_vAt = XMLoadFloat3(&pTransform->GetLook());
-	_vUp = XMLoadFloat3(&pTransform->GetUp());
+	_vEye = pTransform->GetPosition();
+	_vAt = pTransform->GetLook();
+	_vUp = pTransform->GetUp();
 
-	_mView = XMMatrixLookAtLH(_vEye, _vEye + _vAt, XMLoadFloat3(&XMFLOAT3(0, 1, 0)));
-	_mProj = XMMatrixPerspectiveFovLH(_FovY, _Aspect, _Near, _Far);
+	_mView = MakeLookAtLH(_vEye, _vEye + _vAt, POSITIVE_Y);
+	_mProj = MakePerspectiveFovLH(_FovY, _Aspect, _Near, _Far);
 
 	_mViewProj = _mView * _mProj;
 }
@@ -71,24 +71,24 @@ void Camera::SetCameraProjectProperty(const float Fov, const float Aspect, const
 	_Far = Far;
 }
 
-void Camera::SetCameraViewProperty(const XMFLOAT3* Eye, const XMFLOAT3* At, const XMFLOAT3* Up)
+void Camera::SetCameraViewProperty(const acm::float3* Eye, const acm::float3* At, const acm::float3* Up)
 {
-	_vEye = XMLoadFloat3(Eye);
-	_vAt = XMLoadFloat3(At);
-	_vUp = XMLoadFloat3(Up);
+	_vEye = *Eye;
+	_vAt = *At;
+	_vUp = *Up;
 }
 
-const XMMATRIX & Camera::GetView()
+const acm::float4x4 & Camera::GetView()
 {
 	return _mView;
 }
 
-const XMMATRIX & Camera::GetProj()
+const acm::float4x4 & Camera::GetProj()
 {
 	return _mProj;
 }
 
-const XMMATRIX & Camera::GetViewProj()
+const acm::float4x4 & Camera::GetViewProj()
 {
 	return _mViewProj;
 }

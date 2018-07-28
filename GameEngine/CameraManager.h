@@ -28,11 +28,11 @@ public:
 
 	void								Update_CurrentCamera();
 	bool								SetCurrentCamera(const std::string CamName);
-	const XMMATRIX&						GetCurrentCameraViewProj();
-	const XMMATRIX&						GetCurrentCameraProj();
-	const XMMATRIX&						GetCurrentCameraView();
-	const XMFLOAT3						GetCurrentCameraPosition();
-	const XMFLOAT3						GetCurrentCameraDirection();
+	const acm::float4x4&				GetCurrentCameraViewProj();
+	const acm::float4x4&				GetCurrentCameraProj();
+	const acm::float4x4&				GetCurrentCameraView();
+	const acm::float3					GetCurrentCameraPosition();
+	const acm::float3					GetCurrentCameraDirection();
 	Camera*								GetCurrentCamera() {
 		return _CurrentCamera;
 	};

@@ -52,10 +52,10 @@ void SkyBox::Render()
 	Transform* pTransform = GetComponent<Transform>();
 	Texture* pTexture = GetComponent<Texture>();
 
-	XMMATRIX rotateView = CameraManager::This().GetCurrentCameraView();
-	rotateView.r[3] = XMLoadFloat4(&XMFLOAT4(0, 0, 0, 1));
+	float4x4 rotateView = CameraManager::This().GetCurrentCameraView();
+	rotateView._41 = 0.f; rotateView._42 = 0.f; rotateView._43 = 0.f; rotateView._44 = 1.f;
 
-	XMMATRIX worldViewProj = rotateView * CameraManager::This().GetCurrentCameraProj();
+	float4x4 worldViewProj = rotateView * CameraManager::This().GetCurrentCameraProj();
 
 
 	RenderDevice::This().Begin("SkyTech");

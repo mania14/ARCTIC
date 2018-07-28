@@ -13,6 +13,7 @@
 #include "../GameEngine/Transform.h"
 #include "../GameEngine/TerrainMakerManager.h"
 #include "../GameEngine/Collision.h"
+#include "Terrain.h"
 #include "../GameEngine/PickingManager.h"
 #include "ToolTransformManager.h"
 #include "../GameEngine/TerrainMakerManager.h"
@@ -36,16 +37,20 @@ int SkyBoxScene::Init()
 
 	AddGameObject(OBJECT_SKYBOX, skybox);
 
-	//for (int i = 0; i < 1; ++i)
-	{
-		Box* box = new Box();
-		box->Create();
-		box->GetComponent<Transform>()->SetPosition(XMFLOAT3(0,0,30));
-		/*box->GetComponent<Transform>()->SetRotation(XMFLOAT3(270, 180, 0));
-		box->GetComponent<Transform>()->SetScale(XMFLOAT3(10, 10, 10));*/
+	////for (int i = 0; i < 1; ++i)
+	//{
+	//	Box* box = new Box();
+	//	box->Create();
+	//	box->GetComponent<Transform>()->SetPosition(float3(0,0,30));
+	//	//box->GetComponent<Transform>()->SetRotation(float3(270, 180, 0));
+	//	//box->GetComponent<Transform>()->SetScale(float3(10, 10, 10));
 
-		AddGameObject(OBJECT_STATIC, box);
-	}
+	//	AddGameObject(OBJECT_STATIC, box);
+	//}
+
+	Terrain* pTerrain = new Terrain();
+	pTerrain->Create();
+	AddGameObject(OBJECT_STATIC, pTerrain);
 	
 	LightObject* pLightObj = new LightObject();
 	pLightObj->Create();

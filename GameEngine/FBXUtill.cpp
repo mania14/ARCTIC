@@ -229,7 +229,7 @@ void FBXUtill::ReadFBXUVData(FbxMesh* pFbxMesh, Mesh* pMesh)
 	}
 }
 
-void FBXUtill::ReadFBXNormalData(FbxGeometryElementNormal * pElement, XMFLOAT3 * pData)
+void FBXUtill::ReadFBXNormalData(FbxGeometryElementNormal * pElement, acm::float3 * pData)
 {
 }
 

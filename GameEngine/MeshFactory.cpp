@@ -7,6 +7,8 @@
 #include "directxcolors.h"
 #include "TextureManager.h"
 #include "../CommonUtil/Macro.h"
+#include "../System/FileSystem.h"
+#include "TextureManager.h"
 #include <functional>
 
 MeshFactory::MeshFactory()
@@ -28,6 +30,45 @@ void MeshFactory::Release()
 {
 }
 
+bool MeshFactory::CreateTerrainVoxel(MeshBuffer& meshBuffer, std::vector<Vertex_Voxel_Terrain>& _data, std::vector<UINT>& _index)
+{
+	//정점 버퍼 생성
+
+	D3D11_BUFFER_DESC vBufferDesc;
+	vBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vBufferDesc.ByteWidth = sizeof(Vertex_Voxel_Terrain) * _data.size();
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
+	vBufferDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA vInitData;
+	vInitData.pSysMem = &_data[0];
+
+	if (FAILED(RenderDevice::This().GetDevice()->CreateBuffer(&vBufferDesc, &vInitData, &meshBuffer.vBuffer)))
+	{
+		return false;
+	}
+
+	//create buffer indices;
+
+	D3D11_BUFFER_DESC vIdxBufferDesc;
+	vIdxBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vIdxBufferDesc.ByteWidth = sizeof(UINT) * (UINT)_index.size();
+	vIdxBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	vIdxBufferDesc.CPUAccessFlags = 0;
+	vIdxBufferDesc.MiscFlags = 0;
+	vIdxBufferDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA iIdxInitData;
+	iIdxInitData.pSysMem = &_index[0];
+
+	if(FAILED(RenderDevice::This().GetDevice()->CreateBuffer(&vIdxBufferDesc, &iIdxInitData, &meshBuffer.vIBuffer), L"CreateBuffer Index Mesh Buffer Fail"));
+	{
+		return false;
+	}
+}
+
 bool MeshFactory::CreateBox(Mesh & meshData)
 {
 	//정점 버퍼 생성
@@ -42,35 +83,35 @@ bool MeshFactory::CreateBox(Mesh & meshData)
 
 	std::vector<Vertex_Tex> vertices =
 	{
-		/*	{ XMFLOAT3(-w2, -h2, -d2), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(-w2, +h2, -d2), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(+w2, +h2, -d2), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-			{ XMFLOAT3(+w2, -h2, -d2), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+		/*	{ acm::float3(-w2, -h2, -d2), acm::float3(0.0f, 0.0f, -1.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(-w2, +h2, -d2), acm::float3(0.0f, 0.0f, -1.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(+w2, +h2, -d2), acm::float3(0.0f, 0.0f, -1.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(1.0f, 0.0f) },
+			{ acm::float3(+w2, -h2, -d2), acm::float3(0.0f, 0.0f, -1.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(1.0f, 1.0f) },
 
-			{ XMFLOAT3(-w2, -h2, +d2), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
-			{ XMFLOAT3(+w2, -h2, +d2), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(+w2, +h2, +d2), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(-w2, +h2, +d2), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+			{ acm::float3(-w2, -h2, +d2), acm::float3(0.0f, 0.0f, 1.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(1.0f, 1.0f) },
+			{ acm::float3(+w2, -h2, +d2), acm::float3(0.0f, 0.0f, 1.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(+w2, +h2, +d2), acm::float3(0.0f, 0.0f, 1.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(-w2, +h2, +d2), acm::float3(0.0f, 0.0f, 1.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(1.0f, 0.0f) },
 
-			{ XMFLOAT3(-w2, +h2, -d2), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(-w2, +h2, +d2), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(+w2, +h2, +d2), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
-			{ XMFLOAT3(+w2, +h2, -d2), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
+			{ acm::float3(-w2, +h2, -d2), acm::float3(0.0f, 1.0f, 0.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(-w2, +h2, +d2), acm::float3(0.0f, 1.0f, 0.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(+w2, +h2, +d2), acm::float3(0.0f, 1.0f, 0.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(1.0f, 0.0f) },
+			{ acm::float3(+w2, +h2, -d2), acm::float3(0.0f, 1.0f, 0.0f), acm::float3(1.0f, 0.0f, 0.0f), acm::float2(1.0f, 1.0f) },
 
-			{ XMFLOAT3(-w2, -h2, -d2), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f) },
-			{ XMFLOAT3(+w2, -h2, -d2), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(+w2, -h2, +d2), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(-w2, -h2, +d2), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f) },
+			{ acm::float3(-w2, -h2, -d2), acm::float3(0.0f, -1.0f, 0.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(1.0f, 1.0f) },
+			{ acm::float3(+w2, -h2, -d2), acm::float3(0.0f, -1.0f, 0.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(+w2, -h2, +d2), acm::float3(0.0f, -1.0f, 0.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(-w2, -h2, +d2), acm::float3(0.0f, -1.0f, 0.0f), acm::float3(-1.0f, 0.0f, 0.0f), acm::float2(1.0f, 0.0f) },
 
-			{ XMFLOAT3(-w2, -h2, +d2), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(-w2, +h2, +d2), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(-w2, +h2, -d2), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f) },
-			{ XMFLOAT3(-w2, -h2, -d2), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f) },
+			{ acm::float3(-w2, -h2, +d2), acm::float3(-1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, -1.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(-w2, +h2, +d2), acm::float3(-1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, -1.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(-w2, +h2, -d2), acm::float3(-1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, -1.0f), acm::float2(1.0f, 0.0f) },
+			{ acm::float3(-w2, -h2, -d2), acm::float3(-1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, -1.0f), acm::float2(1.0f, 1.0f) },
 
-			{ XMFLOAT3(+w2, -h2, -d2), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f) },
-			{ XMFLOAT3(+w2, +h2, -d2), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f) },
-			{ XMFLOAT3(+w2, +h2, +d2), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f) },
-			{ XMFLOAT3(+w2, -h2, +d2), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },*/
+			{ acm::float3(+w2, -h2, -d2), acm::float3(1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, 1.0f), acm::float2(0.0f, 1.0f) },
+			{ acm::float3(+w2, +h2, -d2), acm::float3(1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, 1.0f), acm::float2(0.0f, 0.0f) },
+			{ acm::float3(+w2, +h2, +d2), acm::float3(1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, 1.0f), acm::float2(1.0f, 0.0f) },
+			{ acm::float3(+w2, -h2, +d2), acm::float3(1.0f, 0.0f, 0.0f), acm::float3(0.0f, 0.0f, 1.0f), acm::float2(1.0f, 1.0f) },*/
 	};
 
 	//인덱스 버퍼 생성
@@ -108,7 +149,7 @@ bool MeshFactory::CreateBox(Mesh & meshData)
 		int index2 = indices[++i];
 		int index3 = indices[++i];
 
-		XMFLOAT3 normal = CalcNoraml(vertices[index1].Pos, vertices[index2].Pos, vertices[index3].Pos);
+		acm::float3 normal = CalcNoraml(vertices[index1].Pos, vertices[index2].Pos, vertices[index3].Pos);
 
 		vertices[index1].Normal.x += normal.x; vertices[index1].Normal.y += normal.y; vertices[index1].Normal.z += normal.z;
 		vertices[index2].Normal.x += normal.x; vertices[index2].Normal.y += normal.y; vertices[index2].Normal.z += normal.z;
@@ -220,10 +261,10 @@ bool MeshFactory::CreateGrid(int x, int z, float depth, Mesh & meshData)
 	{
 		for (int j = 0; j < x; ++j)
 		{
-			meshData.vecVertex[(i * x) + j].Pos = XMFLOAT3((float)j, 0.0f, (float)i);
-			meshData.vecVertex[(i * x) + j].Normal = XMFLOAT3(0,0,0);
-			meshData.vecVertex[(i * x) + j].Tangent = XMFLOAT3(0, 0, 0);
-			meshData.vecVertex[(i * x) + j].Tex = XMFLOAT2((float)j / (float)x, 1.f - ((float)i / (float)z));
+			meshData.vecVertex[(i * x) + j].Pos = acm::float3((float)j, 0.0f, (float)i);
+			meshData.vecVertex[(i * x) + j].Normal = acm::float3(0,0,0);
+			meshData.vecVertex[(i * x) + j].Tangent = acm::float3(0, 0, 0);
+			meshData.vecVertex[(i * x) + j].Tex = acm::float2((float)j / (float)x, 1.f - ((float)i / (float)z));
 		}
 	}
 
@@ -299,16 +340,16 @@ bool MeshFactory::CreateSphere(float radius, UINT numSubdivisions, Mesh& meshDat
 	// not a unique point on the texture map to assign to the pole when mapping
 	// a rectangular texture onto a sphere.
 	Vertex_Tex topVertex;
-	topVertex.Pos = XMFLOAT3(0.0f, +radius, 0.0f);
-	topVertex.Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	topVertex.Tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
-	topVertex.Tex = XMFLOAT2(0.0f, 0.0f);
+	topVertex.Pos = acm::float3(0.0f, +radius, 0.0f);
+	topVertex.Normal = acm::float3(0.0f, 1.0f, 0.0f);
+	topVertex.Tangent = acm::float3(1.0f, 0.0f, 0.0f);
+	topVertex.Tex = acm::float2(0.0f, 0.0f);
 
 	Vertex_Tex bottomVertex;
-	bottomVertex.Pos = XMFLOAT3(0.0f, -radius, 0.0f);
-	bottomVertex.Normal = XMFLOAT3(0.0f, -1.0f, 0.0f);
-	bottomVertex.Tangent = XMFLOAT3(1.0f, 0.0f, 0.0f);
-	bottomVertex.Tex = XMFLOAT2(0.0f, 1.0f);
+	bottomVertex.Pos = acm::float3(0.0f, -radius, 0.0f);
+	bottomVertex.Normal = acm::float3(0.0f, -1.0f, 0.0f);
+	bottomVertex.Tangent = acm::float3(1.0f, 0.0f, 0.0f);
+	bottomVertex.Tex = acm::float2(0.0f, 1.0f);
 
 	meshData.vecVertex.push_back(topVertex);
 
@@ -419,20 +460,20 @@ bool MeshFactory::CreateGeoSphere(float radius, UINT numSubdivisions, Mesh& mesh
 
 	std::vector<Vertex_Tex> vertices =
 	{
-		{ XMFLOAT3(-x, 0.0f, z) },
-		{ XMFLOAT3(x, 0.0f, z)  },
-		{ XMFLOAT3(-x, 0.0f, -z) },
-		{ XMFLOAT3(x, 0.0f, -z) },
+		{ acm::float3(-x, 0.0f, z) },
+		{ acm::float3(x, 0.0f, z)  },
+		{ acm::float3(-x, 0.0f, -z) },
+		{ acm::float3(x, 0.0f, -z) },
 
-		{ XMFLOAT3(0.0f, z, x)  },
-		{ XMFLOAT3(0.0f, z, -x) },
-		{ XMFLOAT3(0.0f, -z, x) },
-		{ XMFLOAT3(0.0f, -z, -x) },
+		{ acm::float3(0.0f, z, x)  },
+		{ acm::float3(0.0f, z, -x) },
+		{ acm::float3(0.0f, -z, x) },
+		{ acm::float3(0.0f, -z, -x) },
 
-		{ XMFLOAT3(z, x, 0.0f) },
-		{ XMFLOAT3(-z, x, 0.0f) },
-		{ XMFLOAT3(z, -x, 0.0f) },
-		{ XMFLOAT3(-z, -x, 0.0f) },
+		{ acm::float3(z, x, 0.0f) },
+		{ acm::float3(-z, x, 0.0f) },
+		{ acm::float3(z, -x, 0.0f) },
+		{ acm::float3(-z, -x, 0.0f) },
 	};
 
 	meshData.vecVertex.assign(vertices.begin(), vertices.end());
@@ -461,7 +502,7 @@ bool MeshFactory::CreateGeoSphere(float radius, UINT numSubdivisions, Mesh& mesh
 		XMStoreFloat3(&meshData.vecVertex[i].Normal, n);
 
 		// Derive texture coordinates from spherical coordinates.
-		float theta = ACMATH::AngleFromXY(
+		float theta = acm::AngleFromXY(
 			meshData.vecVertex[i].Pos.x,
 			meshData.vecVertex[i].Pos.z);
 
@@ -556,19 +597,19 @@ void MeshFactory::Subdivide(Mesh& meshData, UINT numSubdivisions)
 		// For subdivision, we just care about the position component.  We derive the other
 		// vertex components in CreateGeosphere.
 
-		m0.Pos = XMFLOAT3(
+		m0.Pos = acm::float3(
 			0.5f*(v0.Pos.x + v1.Pos.x),
 			0.5f*(v0.Pos.y + v1.Pos.y),
 			0.5f*(v0.Pos.z + v1.Pos.z));
 
 
-		m1.Pos = XMFLOAT3(
+		m1.Pos = acm::float3(
 			0.5f*(v1.Pos.x + v2.Pos.x),
 			0.5f*(v1.Pos.y + v2.Pos.y),
 			0.5f*(v1.Pos.z + v2.Pos.z));
 
 
-		m2.Pos = XMFLOAT3(
+		m2.Pos = acm::float3(
 			0.5f*(v0.Pos.x + v2.Pos.x),
 			0.5f*(v0.Pos.y + v2.Pos.y),
 			0.5f*(v0.Pos.z + v2.Pos.z));
@@ -604,12 +645,12 @@ void MeshFactory::Subdivide(Mesh& meshData, UINT numSubdivisions)
 	Subdivide(meshData, --numSubdivisions);
 }
 
-XMFLOAT3 MeshFactory::CalcNoraml(XMFLOAT3 v0, XMFLOAT3 v1, XMFLOAT3 v2)
+acm::float3 MeshFactory::CalcNoraml(acm::float3 v0, acm::float3 v1, acm::float3 v2)
 {
 	XMVECTOR u = XMLoadFloat3(&v1) - XMLoadFloat3(&v0);
 	XMVECTOR v = XMLoadFloat3(&v2) - XMLoadFloat3(&v0);
 
-	XMFLOAT3 normal;
+	acm::float3 normal;
 	XMStoreFloat3(&normal, XMVector3Normalize(XMVector3Cross(u, v)));
 
 	return normal;
@@ -633,7 +674,20 @@ void MeshFactory::ConvertFBXMesh(Mesh* meshData, FbxNode* fbNode)
 	meshData->Init();
 	FbxMesh * currMesh = fbNode->GetMesh();
 
-	meshData->pTexture[Mesh::TEXTURE_TYPE_DIFFUSE] = TextureManager::This().CreateFBXTexture(meshData->meshFilename, fbNode);
+	std::vector<std::string> vecTextureName;
+
+	int materialCount = fbNode->GetMaterialCount();
+	for (int i = 0; i < materialCount; ++i)
+	{
+		char temp[MAX_PATH] = { 0 };
+		sprintf_s(temp, MAX_PATH, "%s%s", FileSystem::GetFilePath(meshData->meshFilename).c_str(), fbNode->GetMaterial(i)->GetName());
+		vecTextureName.push_back(std::string(FileSystem::SwitchFileFormat(temp, ".dds")));
+	}
+
+	if (materialCount > 0)
+	{
+		meshData->pTexture[Mesh::TEXTURE_TYPE_DIFFUSE] = TextureManager::This().LoadTexture2DArray(meshData->meshFilename, vecTextureName);
+	}
 
 	if (currMesh != nullptr)
 	{

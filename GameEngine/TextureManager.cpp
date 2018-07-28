@@ -142,28 +142,7 @@ Texture* TextureManager::LoadTexture2DArray(std::string textureSetName, std::vec
 	return pTexture;
 }
 
-Texture* TextureManager::CreateFBXTexture(const std::string& meshName, FbxNode* pNode)
-{
-	std::vector<std::string> vecTextureName;
-
-	int materialCount = pNode->GetMaterialCount();
-	for (int i = 0; i < materialCount; ++i)
-	{
-		char temp[MAX_PATH] = {0};
-		sprintf_s(temp, MAX_PATH, "%s%s", FileSystem::GetFilePath(meshName).c_str(), pNode->GetMaterial(i)->GetName());
-		vecTextureName.push_back(std::string(FileSystem::SwitchFileFormat(temp, ".dds")));
-	}
-
-	if(materialCount > 0)
-	{
-		return LoadTexture2DArray( meshName, vecTextureName);
-	}else
-	{
-		return nullptr;
-	}
-}
-
-Texture * TextureManager::CreateRenderTargetTexture(UINT width, UINT height, DXGI_FORMAT format, UINT BinfFlags)
+Texture * TextureManager::CreateRenderTargetTexture(UINT width, UINT height, DXGI_FORMAT format, UINT BindFlags)
 {
 	D3D11_TEXTURE2D_DESC texDesc;
 
@@ -179,7 +158,7 @@ Texture * TextureManager::CreateRenderTargetTexture(UINT width, UINT height, DXG
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = BinfFlags; //D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	texDesc.BindFlags = BindFlags; //D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
 
@@ -251,22 +230,114 @@ Texture * TextureManager::CreateRenderTargetTexture(UINT width, UINT height, DXG
 	return pTexture;
 }
 
+Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT depth, UINT BindFlags, void* pData)
+{
+	D3D11_TEXTURE3D_DESC texDesc;
+
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	RenderDevice::This().GetSwapChain()->GetDesc(&swapChainDesc);
+
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.Depth = depth;
+	texDesc.MipLevels = 1;
+	texDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = BindFlags; //D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+
+	ID3D11Texture3D* vaolumeTex = 0;
+
+	D3D11_SUBRESOURCE_DATA resData;
+	resData.pSysMem = pData;
+	resData.SysMemPitch = width * 2 * 4;
+	resData.SysMemSlicePitch = width * height * 2 * 4;
+
+	if( FAILED(RenderDevice::This().GetDevice()->CreateTexture3D(&texDesc, &resData, &vaolumeTex)) )
+	{
+		//º¼·ýÅØ½ºÃÄ »ý¼º½ÇÆÐ
+		return nullptr;
+	}
+
+	Texture* pTexture = new Texture();
+
+	if (texDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
+	{
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		rtvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+		rtvDesc.Texture3D.MipSlice = 0;
+		rtvDesc.Texture3D.FirstWSlice = 0;
+		rtvDesc.Texture3D.WSize = 0;
+
+		if (FAILED(RenderDevice::This().GetDevice()->CreateRenderTargetView(vaolumeTex, &rtvDesc, &pTexture->m_pRenderTargetView)))
+		{
+			//·»´õÅ¸°Ù »ý¼º½ÇÆÐ
+
+			delete pTexture;
+			vaolumeTex->Release();
+
+			return nullptr;
+		}
+	}
+
+	if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+		srvDesc.Texture3D.MostDetailedMip = 0;
+		srvDesc.Texture3D.MipLevels = 1;
+		if (FAILED(RenderDevice::This().GetDevice()->CreateShaderResourceView(vaolumeTex, &srvDesc, &pTexture->m_pResourceView)))
+		{
+			//·»´õÅ¸°Ù »ý¼º½ÇÆÐ
+
+			delete pTexture;
+			vaolumeTex->Release();
+
+			return nullptr;
+		}
+	}
+
+	if (texDesc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
+	{
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+		uavDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+		uavDesc.Texture3D.MipSlice = 0;
+		uavDesc.Texture3D.FirstWSlice = 0;
+		uavDesc.Texture3D.WSize = 0;
+		if (FAILED(RenderDevice::This().GetDevice()->CreateUnorderedAccessView(vaolumeTex, &uavDesc, &pTexture->m_pUnorderdView)))
+		{
+			//·»´õÅ¸°Ù »ý¼º½ÇÆÐ
+
+			delete pTexture;
+			vaolumeTex->Release();
+
+			return nullptr;
+		}
+	}
+
+	return pTexture;
+}
+
 Texture* TextureManager::CreateNoiseTexture(UINT width, UINT height)
 {
 	//float* data = new float[width * height * 3];
 
 	//for (int i = 0; i < width * height * 3; i+=3)
 	//{
-	//	XMFLOAT3 temp = RandomManager::This().RandomNormal();
+	//	acm::float3 temp = RandomManager::This().RandomNormal();
 	//	data[i] = temp.x;
 	//	data[i + 1] = temp.y;
 	//	data[i + 2] = temp.z;
 	//}
 	byte* data = new byte[width * height * 4];
 
-	for (int i = 0; i < width * height * 4; i+=4)
+	for (UINT i = 0; i < width * height * 4; i+=4)
 	{
-		XMFLOAT3 temp = RandomManager::This().RandomNormal();
+		acm::float3 temp = RandomManager::This().RandomNormal();
 		temp.x *= 1000;
 		temp.y *= 1000;
 		temp.z *= 1000;

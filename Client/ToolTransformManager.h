@@ -50,7 +50,7 @@ private:
 	PickMode			CurrentMode;
 	PickAxis			CurrentAxis;
 	GameObject*			_currentGameObject;
-	DirectX::XMVECTOR	_vecOldRay;
+	acm::float3				_vecOldRay;
 	bool				_isClicked;
 	Gizmo*				_pGizmo;
 

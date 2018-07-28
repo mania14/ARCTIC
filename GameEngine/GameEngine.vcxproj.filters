@@ -40,7 +40,7 @@
     <Filter Include="소스 파일\Physx">
       <UniqueIdentifier>{d4ca7f00-715b-4307-b3a4-03a2f805f711}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\CommonUtil">
+    <Filter Include="소스 파일\Pick">
       <UniqueIdentifier>{d2f4c3bb-3bd6-4c73-952b-e7b5b158ba36}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -115,7 +115,7 @@
       <Filter>소스 파일</Filter>
     </ClInclude>
     <ClInclude Include="PickingManager.h">
-      <Filter>소스 파일\CommonUtil</Filter>
+      <Filter>소스 파일\Pick</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsManager.h">
       <Filter>소스 파일\Physx</Filter>
@@ -126,7 +126,7 @@
     <ClInclude Include="Light.h">
       <Filter>소스 파일\EngineComponent</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
+    <ClInclude Include="TerrainVoxel.h">
       <Filter>소스 파일\EngineComponent</Filter>
     </ClInclude>
   </ItemGroup>
@@ -198,7 +198,7 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PickingManager.cpp">
-      <Filter>소스 파일\CommonUtil</Filter>
+      <Filter>소스 파일\Pick</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsManager.cpp">
       <Filter>소스 파일\Physx</Filter>
@@ -212,7 +212,7 @@
     <ClCompile Include="Light.cpp">
       <Filter>소스 파일\EngineComponent</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp">
+    <ClCompile Include="TerrainVoxel.cpp">
       <Filter>소스 파일\EngineComponent</Filter>
     </ClCompile>
   </ItemGroup>

@@ -36,8 +36,8 @@ void Tree::Create()
 	for (int i = 0; i < 50; ++i)
 	{
 		Vertex_Billboard pData;
-		pData.Pos = XMFLOAT3(i * 10, 20, i * 10);
-		pData.Size = XMFLOAT2(20, 20);
+		pData.Pos = float3((float)i * 10, 20, (float)i * 10);
+		pData.Size = float2(20, 20);
 		vecData.push_back(pData);
 	}
 
@@ -71,7 +71,7 @@ void Tree::Render()
 	Transform* pTransform = GetComponent<Transform>();
 	Texture* pTexture = GetComponent<Texture>();
 
-	XMMATRIX ViewProj = CameraManager::This().GetCurrentCameraViewProj();
+	float4x4 ViewProj = CameraManager::This().GetCurrentCameraViewProj();
 
 	RenderDevice::This().Begin("LightBillboardTech");
 	{
@@ -88,10 +88,10 @@ void Tree::Render()
 
 		//마테리얼
 		Material mLandMat;
-		mLandMat.Ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		mLandMat.Diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		mLandMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
-		mLandMat.Reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		mLandMat.Ambient = float4(0.48f, 0.77f, 0.46f, 1.0f);
+		mLandMat.Diffuse = float4(0.48f, 0.77f, 0.46f, 1.0f);
+		mLandMat.Specular = float4(0.2f, 0.2f, 0.2f, 16.0f);
+		mLandMat.Reflect = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		RenderDevice::This().GetRawVariableByName("gMaterial")->SetRawValue(&mLandMat, 0, sizeof(mLandMat));
 
 		//텍스쳐		
@@ -104,7 +104,7 @@ void Tree::Render()
 
 		ID3D11Buffer* pBuffer = pBillboard->GetBillboardBuffer();
 		RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &pBuffer, &stride, &offset);
-		RenderDevice::This().GetContext()->Draw(pBillboard->GetVertexCount(), 0);
+		RenderDevice::This().GetContext()->Draw((int)pBillboard->GetVertexCount(), 0);
 	}
 	RenderDevice::This().End("LightBillboardTech");
 

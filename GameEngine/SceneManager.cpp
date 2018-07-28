@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SceneManager.h"
-#include "PhysicsManager.h"
+//#include "PhysicsManager.h"
 #include "LightManager.h"
 #include "../System/GameTimer.h"
 
@@ -35,5 +35,5 @@ void SceneManager::Render()
 void SceneManager::Release()
 {
 	_CurrentScene->Destroy();
-	PhysicsManager::This().Release();
+	//PhysicsManager::This().Release();
 }

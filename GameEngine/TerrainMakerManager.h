@@ -17,7 +17,7 @@ public:
 	void	Release();
 
 private:
-	std::vector<DirectX::XMFLOAT3>					_TerrainVoxelVertexLookUpTable;
+	std::vector<acm::float3>					_TerrainVoxelVertexLookUpTable;
 	std::vector<std::vector<UINT>>					_TerrainVoxelIdxLookUpTable;
 	std::vector<byte>								_TerrainVoxelMaskLookUpTable;
 	std::vector<MeshBuffer>							_TerrainCellMeshLookUpBuffer;

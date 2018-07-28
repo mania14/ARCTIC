@@ -145,5 +145,13 @@
     <FxCompile Include="..\Res\fx\GBuffer.fx">
       <Filter>소스 파일\FX</Filter>
     </FxCompile>
+    <FxCompile Include="..\Res\fx\TerrainVoxel.fx">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Res\fx\VoxelTerrainLookUpTable.fxh">
+      <Filter>소스 파일\FX</Filter>
+    </None>
   </ItemGroup>
 </Project>

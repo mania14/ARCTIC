@@ -8,11 +8,13 @@ ArcticView::ArcticView()
 	m_timer->start();
 
 	m_time.start();
+
+	Init((HWND)winId(), nullptr);
 }
 
 void ArcticView::Initialize()
 {
-	Init((HWND)winId(), nullptr);
+	
 }
 
 

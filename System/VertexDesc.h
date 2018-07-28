@@ -9,8 +9,8 @@ using namespace DirectX;
 
 struct Vertex_RenderTarget
 {
-	XMFLOAT3 Pos;
-	XMFLOAT2 UV;
+	acm::float3 Pos;
+	acm::float2 UV;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_RenderTarget_Desc[] =
@@ -21,8 +21,8 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_RenderTarget_Desc[] =
 
 struct Vertex_Color
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	acm::float3 Pos;
+	acm::float4 Color;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_Color_Desc[] =
@@ -33,7 +33,7 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_Color_Desc[] =
 
 struct Vertex_Debug
 {
-	XMFLOAT3 Pos;
+	acm::float3 Pos;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_Debug_Desc[] =
@@ -43,11 +43,11 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_Debug_Desc[] =
 
 struct Vertex_Tex
 {
-	XMFLOAT3 Pos;
-	XMFLOAT3 Normal;
-	XMFLOAT3 Tangent;
-	XMFLOAT3 BiNormal;
-	XMFLOAT2 Tex;
+	acm::float3 Pos;
+	acm::float3 Normal;
+	acm::float3 Tangent;
+	acm::float3 BiNormal;
+	acm::float2 Tex;
 	UINT	 TexID;
 };
 
@@ -63,8 +63,8 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_Tex_Desc[] =
 
 struct Vertex_Billboard
 {
-	XMFLOAT3 Pos;
-	XMFLOAT2 Size;
+	acm::float3 Pos;
+	acm::float2 Size;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_Billboard_Desc[] =
@@ -75,7 +75,7 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_Billboard_Desc[] =
 
 struct Vertex_Instance
 {
-	XMFLOAT4X4 World;
+	acm::float4x4 World;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_Instance_Desc[] =
@@ -88,22 +88,32 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_Instance_Desc[] =
 
 //struct Vertex_VoxelTerrain_Instance
 //{
-//	XMFLOAT4	Position;
+//	acm::float4	Position;
 //};
+
+struct Vertex_Voxel_Terrain
+{
+	acm::float3 _voxelInfo;
+};
+
+static D3D11_INPUT_ELEMENT_DESC Vertex_Voxel_Terrain_Desc[] =
+{
+	{ "VOXELINFO",	  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+};
 
 struct Vertex_VoxelTerrain_Instance
 {
-	XMFLOAT3	PosIndex;
-	XMFLOAT4	Density0;
-	XMFLOAT4	Density1;
-	XMFLOAT3	Normal0;
-	XMFLOAT3	Normal1;
-	XMFLOAT3	Normal2;
-	XMFLOAT3	Normal3;
-	XMFLOAT3	Normal4;
-	XMFLOAT3	Normal5;
-	XMFLOAT3	Normal6;
-	XMFLOAT3	Normal7;
+	acm::float3	PosIndex;
+	acm::float4	Density0;
+	acm::float4	Density1;
+	acm::float3	Normal0;
+	acm::float3	Normal1;
+	acm::float3	Normal2;
+	acm::float3	Normal3;
+	acm::float3	Normal4;
+	acm::float3	Normal5;
+	acm::float3	Normal6;
+	acm::float3	Normal7;
 };
 
 static D3D11_INPUT_ELEMENT_DESC Vertex_VoxelTerrain_Instance_Desc[] =
@@ -123,10 +133,10 @@ static D3D11_INPUT_ELEMENT_DESC Vertex_VoxelTerrain_Instance_Desc[] =
 
 struct TerrainVertex
 {
-	XMFLOAT3 Pos;
-	XMFLOAT3 Normal;
-	XMFLOAT3 Tangent;
-	XMFLOAT2 UV;
+	acm::float3 Pos;
+	acm::float3 Normal;
+	acm::float3 Tangent;
+	acm::float2 UV;
 };
 
 struct VertexDescInfo
@@ -154,6 +164,7 @@ public:
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("VerticalBlur", VertexDescInfo(0, nullptr)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("PerlinNoise", VertexDescInfo(sizeof(Vertex_RenderTarget_Desc), Vertex_RenderTarget_Desc)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainTech", VertexDescInfo(sizeof(Vertex_VoxelTerrain_Instance_Desc), Vertex_VoxelTerrain_Instance_Desc)));
+		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainVoxelTech", VertexDescInfo(sizeof(Vertex_Voxel_Terrain_Desc), Vertex_Voxel_Terrain_Desc)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("DebugTech", VertexDescInfo(sizeof(Vertex_Debug_Desc), Vertex_Debug_Desc)));
 	};
 	~VertexDesc() {};

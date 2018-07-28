@@ -19,10 +19,10 @@ int Mesh::Init()
 {
 	//마테리얼
 	pMaterial = new Material();
-	pMaterial->Ambient = XMFLOAT4(1.f, 1.f, 1.f, 1.0f);
-	pMaterial->Diffuse = XMFLOAT4(1.f, 1.f, 1.f, 1.0f);
-	pMaterial->Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
-	pMaterial->Reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	pMaterial->Ambient = acm::float4(1.f, 1.f, 1.f, 1.0f);
+	pMaterial->Diffuse = acm::float4(1.f, 1.f, 1.f, 1.0f);
+	pMaterial->Specular = acm::float4(0.2f, 0.2f, 0.2f, 16.0f);
+	pMaterial->Reflect = acm::float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	return false;
 }

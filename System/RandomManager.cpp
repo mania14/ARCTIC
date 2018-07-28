@@ -56,13 +56,10 @@ double RandomManager::WELLRNG512a(void)
 	return ((double)STATE[state_i]) * FACT;
 }
 
-DirectX::XMFLOAT3 RandomManager::RandomNormal()
+acm::float3 RandomManager::RandomNormal()
 {
-	DirectX::XMFLOAT3 value((float)WELLRNG512a(), (float)WELLRNG512a(), (float)WELLRNG512a());
-
-	DirectX::XMVECTOR temp = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&value));
-	XMStoreFloat3(&value, temp);
-
+	acm::float3 value((float)WELLRNG512a(), (float)WELLRNG512a(), (float)WELLRNG512a());
+	value.normalize();
 	return value;
 }
 

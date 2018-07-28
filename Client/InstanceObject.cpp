@@ -58,9 +58,11 @@ void InstanceObject::Render()
 	Texture* pTexture = GetComponent<Texture>();
 	Instancing* pInstancing = GetComponent<Instancing>();
 
-	XMMATRIX worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
-	XMMATRIX world = pTransform->GetWorldMatrix();
-	XMMATRIX worldInvTranspose = pTransform->GetWorldMatrixInvTranspose();
+	float4x4 worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
+	float4x4 world = pTransform->GetWorldMatrix();
+	float4x4 worldInvTranspose = world;
+	worldInvTranspose.inverse();
+	worldInvTranspose.transpose();
 
 
 	RenderDevice::This().Begin("defaultlight");
@@ -76,10 +78,10 @@ void InstanceObject::Render()
 
 		//마테리얼
 		Material mLandMat;
-		mLandMat.Ambient = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		mLandMat.Diffuse = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		mLandMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
-		mLandMat.Reflect = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+		mLandMat.Ambient = float4(0.48f, 0.77f, 0.46f, 1.0f);
+		mLandMat.Diffuse = float4(0.48f, 0.77f, 0.46f, 1.0f);
+		mLandMat.Specular = float4(0.2f, 0.2f, 0.2f, 16.0f);
+		mLandMat.Reflect = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		RenderDevice::This().GetRawVariableByName("gMaterial")->SetRawValue(&mLandMat, 0, sizeof(mLandMat));
 
 		//텍스쳐		
@@ -93,7 +95,7 @@ void InstanceObject::Render()
 		//RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &pMesh->GetMeshBuffer()->vBuffer, &stride, &offset);
 		//RenderDevice::This().GetContext()->DrawIndexed((int)pMesh->GetIndicsCount(), 0, 0);
 
-		UINT stride[2] = { pMesh->GetVertexSize(), pInstancing->GetVertexSize() };
+		UINT stride[2] = { (UINT)pMesh->GetVertexSize(), (UINT)pInstancing->GetVertexSize() };
 		UINT offset[2] = { 0,0 };
 		ID3D11Buffer* vBuffers[2] = { pMesh->GetMeshBuffer()->vBuffer, pInstancing->GetBuffer()};
 

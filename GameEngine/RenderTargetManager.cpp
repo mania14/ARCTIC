@@ -7,10 +7,10 @@
 
 const std::vector<Vertex_RenderTarget> RenderTargetManager::_ScreenQuadVertices =
 {
-	{ XMFLOAT3(-1,-1,0), XMFLOAT2(0, 1) },
-	{ XMFLOAT3(-1,+1,0), XMFLOAT2(0, 0) },
-	{ XMFLOAT3(+1,+1,0), XMFLOAT2(1, 0) },
-	{ XMFLOAT3(+1,-1,0), XMFLOAT2(1, 1) },
+	{ acm::float3(-1,-1,0), acm::float2(0, 1) },
+	{ acm::float3(-1,+1,0), acm::float2(0, 0) },
+	{ acm::float3(+1,+1,0), acm::float2(1, 0) },
+	{ acm::float3(+1,-1,0), acm::float2(1, 1) },
 };
 
 const std::vector<UINT> RenderTargetManager::_ScreenQuadIndices =
@@ -105,7 +105,7 @@ void RenderTargetManager::DrawScreenQuadRaw()
 	UINT stride = sizeof(Vertex_RenderTarget);
 	UINT offset = 0;
 
-	XMMATRIX identity = XMMatrixIdentity();
+	acm::float4x4 identity = acm::float4x4(acm::Identity);
 
 	RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &_ScreenQuadBuffer->vBuffer, &stride, &offset);
 	RenderDevice::This().GetContext()->IASetIndexBuffer(_ScreenQuadBuffer->vIBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -123,17 +123,15 @@ void RenderTargetManager::DrawScreenQuad()
 	RenderDevice::This().GetRawVariableByName("gNormalTex")->AsShaderResource()->SetResource(_RenderTargetList[RenderTargetManager::eRT_NORMAL]->m_pResourceView);
 	RenderDevice::This().GetRawVariableByName("gSpecTex")->AsShaderResource()->SetResource(_RenderTargetList[RenderTargetManager::eRT_SPECPOWER]->m_pResourceView);
 
-	const XMMATRIX pProj = CameraManager::This().GetCurrentCamera()->GetProj();
-	XMFLOAT4 PerspectiveValues;
-	XMFLOAT3 temp;
-	XMStoreFloat3(&temp, pProj.r[0]); PerspectiveValues.x = 1.0f / temp.x;
-	XMStoreFloat3(&temp, pProj.r[1]); PerspectiveValues.y = 1.0f / temp.y;
-	XMStoreFloat3(&temp, pProj.r[3]); PerspectiveValues.z = temp.z;
-	XMStoreFloat3(&temp, pProj.r[2]); PerspectiveValues.w = -temp.z;
-	RenderDevice::This().GetRawVariableByName("PerspectiveValues")->AsVector()->SetRawValue(&PerspectiveValues, 0, sizeof(XMFLOAT4));
+	const acm::float4x4 pProj = CameraManager::This().GetCurrentCamera()->GetProj();
+	acm::float4 PerspectiveValues;
+	PerspectiveValues.x = 1.0f / CameraManager::This().GetCurrentCamera()->GetProj()._11;
+	PerspectiveValues.y = 1.0f / CameraManager::This().GetCurrentCamera()->GetProj()._22;
+	PerspectiveValues.z = CameraManager::This().GetCurrentCamera()->GetProj()._33;
+	PerspectiveValues.w = -CameraManager::This().GetCurrentCamera()->GetProj()._33;
+	RenderDevice::This().GetRawVariableByName("PerspectiveValues")->AsVector()->SetRawValue(&PerspectiveValues, 0, sizeof(acm::float4));
 
-	const XMMATRIX pView = CameraManager::This().GetCurrentCamera()->GetView();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(pView), pView);
+	acm::float4x4 invView = CameraManager::This().GetCurrentCamera()->GetView().inverse_val();
 	RenderDevice::This().GetVariableByName("ViewInv")->SetMatrix(reinterpret_cast<float*>(&invView));
 
 	RenderDevice::This().GetContext()->IASetInputLayout(NULL);

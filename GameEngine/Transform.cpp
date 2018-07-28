@@ -4,19 +4,19 @@
 #include "../System/RenderDevice.h"
 #include "CameraManager.h"
 
-Transform::Transform()
-	: _Position(XMFLOAT3(0,0,0))
-	, _Scale(XMFLOAT3(1.f, 1.f, 1.f))
-	, _Rotation(XMFLOAT3(0, 0, 0))
-	, _Right(XMFLOAT3(1, 0, 0))
-	, _Up(XMFLOAT3(0, 1, 0))
-	, _Look(XMFLOAT3(0, 0, 1))
-	, _Speed(1.f)
-	, _Center(XMFLOAT3(0, 0, 0))
-	, _Extents(XMFLOAT3(1, 1, 1))
-{
-	_mWorld = XMMatrixIdentity();
+using namespace acm;
 
+Transform::Transform()
+	: _Position(float3(0,0,0))
+	, _Scale(float3(1.f, 1.f, 1.f))
+	, _Rotation(float3(0, 0, 0))
+	, _Right(float3(1, 0, 0))
+	, _Up(float3(0, 1, 0))
+	, _Look(float3(0, 0, 1))
+	, _Speed(1.f)
+	, _Center(float3(0, 0, 0))
+	, _Extents(float3(1, 1, 1))
+{
 	++_refCount[GetComponentID()];
 }
 
@@ -35,24 +35,22 @@ int Transform::Update()
 	_Rotation.x = _Rotation.x >= 360.f ? 0 : _Rotation.x;
 	_Rotation.y = _Rotation.y >= 360.f ? 0 : _Rotation.y;
 	_Rotation.z = _Rotation.z >= 360.f ? 0 : _Rotation.z;
-
-	XMVECTOR vScale = XMLoadFloat3(&_Scale);
 	
-	XMFLOAT3 fRotation = _Rotation;
-	fRotation.x *= DEGREE_TO_RADIAN;
-	fRotation.y *= DEGREE_TO_RADIAN;
-	fRotation.z *= DEGREE_TO_RADIAN;
+	float3 fRotation = _Rotation * DEGREE_TO_RADIAN;
 
-	XMVECTOR vRotation = XMLoadFloat3(&fRotation);
-	XMVECTOR vPosition = XMLoadFloat3(&_Position);
+	//XMVECTOR vRotation = XMLoadFloat3(&fRotation);
+	//XMVECTOR vPosition = XMLoadFloat3(&_Position);
 
-	XMMATRIX mRotation = XMMatrixRotationRollPitchYawFromVector(vRotation);
-	XMStoreFloat3(&_Right, XMVector3TransformNormal(XMLoadFloat3(&XMFLOAT3(1, 0, 0)), mRotation));
-	XMStoreFloat3(&_Up, XMVector3TransformNormal(XMLoadFloat3(&XMFLOAT3(0, 1, 0)), mRotation));
-	XMStoreFloat3(&_Look, XMVector3TransformNormal(XMLoadFloat3(&XMFLOAT3(0, 0, 1)), mRotation));
+	float4x4 mRotation = MakeQuaternionToRotateMatrix(fRotation);
+	_Right = float3(mRotation._11, mRotation._21, mRotation._31);
+	_Up = float3(mRotation._12, mRotation._22, mRotation._32);
+	_Look = float3(mRotation._13, mRotation._23, mRotation._33);
 
-	_mWorld = XMMatrixScalingFromVector(vScale) * mRotation * XMMatrixTranslationFromVector(vPosition);
-	_mWorldNoScale = mRotation * XMMatrixTranslationFromVector(vPosition);
+	_mWorld = mRotation;
+	_mWorld._41 = _Position.x;
+	_mWorld._42 = _Position.y;
+	_mWorld._43 = _Position.z;
+	_mWorld._44 = 1.f;
 
 	return 0;
 }
@@ -62,39 +60,39 @@ int Transform::Release()
 	return 0;
 }
 
-void Transform::SetPosition(const XMFLOAT3 & position)
+void Transform::SetPosition(const float3 & position)
 {
 	_Position.x = position.x;
 	_Position.y = position.y;
 	_Position.z = position.z;
 }
 
-const XMFLOAT3& Transform::GetPosition()
+const float3& Transform::GetPosition()
 {
 	return _Position;
 }
 
-void Transform::SetScale(const XMFLOAT3 & scale)
+void Transform::SetScale(const float3 & scale)
 {
 	_Scale = scale;
 }
 
-const XMFLOAT3& Transform::GetScale()
+const float3& Transform::GetScale()
 {
 	return _Scale;
 }
 
-void Transform::SetRotation(const XMFLOAT3 & rotation)
+void Transform::SetRotation(const float3 & rotation)
 {
 	_Rotation = rotation;
 }
 
-const XMFLOAT3& Transform::GetRotation()
+const float3& Transform::GetRotation()
 {
 	return _Rotation;
 }
 
-void Transform::SetLook(const XMFLOAT3 & look)
+void Transform::SetLook(const float3 & look)
 {
 	_Look = look;
 
@@ -107,44 +105,39 @@ void Transform::SetLook(const XMFLOAT3 & look)
 	_Rotation.y = atan2f(_Look.x, _Look.z) * RADIAN_TO_DEGREE;
 }
 
-const XMFLOAT3 & Transform::GetLook()
+const float3 & Transform::GetLook()
 {
 	return _Look;
 }
 
-const XMFLOAT3 & Transform::GetRight()
+const float3 & Transform::GetRight()
 {
 	return _Right;
 }
 
-const XMFLOAT3 & Transform::GetUp()
+const float3 & Transform::GetUp()
 {
 	return _Up;
 }
 
-const XMMATRIX& Transform::GetWorldMatrix()
+const float4x4& Transform::GetWorldMatrix()
 {
 	return _mWorld;
 }
 
-const XMMATRIX & Transform::GetWorldMatrixNoScale()
-{
-	return _mWorldNoScale;
-}
-
-const XMMATRIX Transform::GetWorldMatrixInvTranspose()
-{
-	// Inverse-transpose is just applied to normals.  So zero out 
-	// translation row so that it doesn't get into our inverse-transpose
-	// calculation--we don't want the inverse-transpose of the translation. 
-	 
-	 
-	DirectX::XMMATRIX A = _mWorld;
-	A.r[3] = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-
-	DirectX::XMVECTOR det = DirectX::XMMatrixDeterminant(A);
-	return DirectX::XMMatrixTranspose(XMMatrixInverse(&det, A));
-}
+//const float4x4 Transform::GetWorldMatrixInvTranspose()
+//{
+//	// Inverse-transpose is just applied to normals.  So zero out 
+//	// translation row so that it doesn't get into our inverse-transpose
+//	// calculation--we don't want the inverse-transpose of the translation. 
+//	 
+//	 
+//	DirectX::acm::float4x4 A = _mWorld;
+//	A.r[3] = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+//
+//	DirectX::XMVECTOR det = DirectX::acm::float4x4Determinant(A);
+//	return DirectX::acm::float4x4Transpose(acm::float4x4Inverse(&det, A));
+//}
 
 void Transform::RenderBox()
 {
@@ -232,14 +225,14 @@ void Transform::RenderBox()
 		UINT stride = sizeof(Vertex_Debug);
 		UINT offset = 0;
 
-		XMFLOAT4 color(1, 0, 0, 1);
-		XMMATRIX worldviewproj = GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
+		float4 color(1, 0, 0, 1);
+		float4x4 worldviewproj = GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
 
 		{
 			RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			RenderDevice::This().GetContext()->OMSetDepthStencilState(RenderStates::This().NoUseDepthStencilDSS, 0);
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
-			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&color, 0, sizeof(XMFLOAT3));
+			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&color, 0, sizeof(float3));
 			RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &(pBuffer), &stride, &offset);
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((Count), 0);

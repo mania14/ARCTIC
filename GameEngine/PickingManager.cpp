@@ -9,24 +9,26 @@
 #include "SceneManager.h"
 #include "BaseScene.h"
 
+using namespace acm;
+
 void PickingManager::init()
 {
 }
 
 size_t PickingManager::RayPick(const std::list<GameObject*>& input, const int mousePosX, const int mousePosY, std::list<GameObject*>& output)
 {
-	XMMATRIX invMatView = XMMatrixInverse(&XMMatrixDeterminant(CameraManager::This().GetCurrentCameraView()), CameraManager::This().GetCurrentCameraView());
-	XMFLOAT4X4 matProj;
-	XMStoreFloat4x4(&matProj, CameraManager::This().GetCurrentCameraProj());
+	float4x4 invMatView = CameraManager::This().GetCurrentCameraView().inverse_val();
+	float4x4 matProj = CameraManager::This().GetCurrentCameraProj();
 
 	float vx = (float)mousePosX / (float)RenderDevice::This().GetWidth() * 2.0f - 1.f;
-	vx /= matProj(0,0);
+	vx /= matProj._11;
 	float vy = (float)mousePosY / (float)RenderDevice::This().GetHeight() * -2.0f + 1.f;
-	vy /= matProj(1,1);
+	vy /= matProj._22;
 
-	XMVECTOR rayOrigin = XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), invMatView);
-	XMFLOAT3 fRayOrigin;
-	XMStoreFloat3(&fRayOrigin, rayOrigin);
+	// 체크하고 갑시다!!!!
+	//XMVECTOR rayOrigin = XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), invMatView);
+	float3 fRayOrigin(invMatView._41, invMatView._42, invMatView._43);
+	//XMStoreFloat3(&fRayOrigin, rayOrigin);
 	_MovePickOrigin.x = _prevPickOrigin.x - fRayOrigin.x;
 	_MovePickOrigin.y = _prevPickOrigin.y - fRayOrigin.y;
 	_prevPickOrigin = fRayOrigin;
@@ -37,28 +39,26 @@ size_t PickingManager::RayPick(const std::list<GameObject*>& input, const int mo
 		Transform* pTransform = (*iter)->GetComponent<Transform>();
 		if(nullptr != pTransform)
 		{
-			XMMATRIX inMatWorld = XMMatrixInverse(&XMMatrixDeterminant(pTransform->GetWorldMatrix()), pTransform->GetWorldMatrix());
-
-			XMVECTOR vecRayDir = XMVector3TransformNormal(XMVectorSet(vx, vy, 1.0f, 0.0f), XMMatrixMultiply(invMatView, inMatWorld));
-			XMVECTOR vecRayOrigin = XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), XMMatrixMultiply(invMatView, inMatWorld));
+			float4x4 invMatWorld = pTransform->GetWorldMatrix().inverse_val();
+			float4x4 invMatWorldView = invMatView * invMatWorld;
+			float3 vecRayDir = acm::TransformNormal(float3(vx, vy, 1.f), invMatView * invMatWorldView);
+			vecRayDir.normalize();
+			float3 vecRayOrigin(invMatWorldView._41, invMatWorldView._42, invMatWorldView._43);
 
 			float dist = 0;
 			BoundingBox box(pTransform->GetCenter(), pTransform->GetExtents());
-			if(box.Intersects(vecRayOrigin, XMVector3Normalize(vecRayDir), dist))
+			/*if(box.Intersects(vecRayOrigin, vecRayDir, dist))
 			{
 				output.push_back(*iter);
-			}
+			}*/
 		}
 	}
 
-	XMVECTOR camPos = XMLoadFloat3(&CameraManager::This().GetCurrentCameraPosition());
+	float3 camPos = CameraManager::This().GetCurrentCameraPosition();
 	
 	auto miniter = std::min_element(output.begin(), output.end(), [&](GameObject* &lhs, GameObject* &rhs)->bool
 	{
-		XMVECTOR lhsPos = XMLoadFloat3(&lhs->GetComponent<Transform>()->GetPosition());
-		XMVECTOR rhsPos = XMLoadFloat3(&rhs->GetComponent<Transform>()->GetPosition());
-
-		return XMVectorGetX(XMVector3LengthSq(lhsPos - camPos)) > XMVectorGetX(XMVector3LengthSq(rhsPos - camPos));
+		return (lhs->GetComponent<Transform>()->GetPosition() - camPos).lengthsq() > (rhs->GetComponent<Transform>()->GetPosition() - camPos).lengthsq();
 	});
 
 	if(miniter != output.end())
@@ -72,27 +72,25 @@ size_t PickingManager::RayPick(const std::list<GameObject*>& input, const int mo
 	return output.size();
 }
 
-bool PickingManager::RayPick(const int mousePosX, const int mousePosY, DirectX::BoundingBox& bBox, float & dist)
+bool PickingManager::RayPick(const int mousePosX, const int mousePosY, acm::AABB& bBox, float & dist)
 {
-	XMMATRIX invMatView = XMMatrixInverse(&XMMatrixDeterminant(CameraManager::This().GetCurrentCameraView()), CameraManager::This().GetCurrentCameraView());
-	XMFLOAT4X4 matProj;
-	XMStoreFloat4x4(&matProj, CameraManager::This().GetCurrentCameraProj());
+	acm::float4x4 invMatView = CameraManager::This().GetCurrentCameraView().inverse_val();
+	acm::float4x4 matProj = CameraManager::This().GetCurrentCameraProj();
 
 	float vx = (float)mousePosX / (float)RenderDevice::This().GetWidth() * 2.0f - 1.f;
 	vx /= matProj(0, 0);
 	float vy = (float)mousePosY / (float)RenderDevice::This().GetHeight() * -2.0f + 1.f;
 	vy /= matProj(1, 1);
 
-	XMVECTOR vecRayDir = XMVector3TransformNormal(XMVectorSet(vx, vy, 1.0f, 0.0f), invMatView);
-	XMVECTOR vecRayOrigin = XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), invMatView);
+	float3 vecRayDir = acm::TransformCoord(float3(vx, vy, 1.f), invMatView);
+	vecRayDir.normalize();
+	float3 vecRayOrigin = acm::TransformCoord(float3(0.0f, 0.0f, 0.0f), invMatView);
 
-	XMFLOAT3 fRayOrigin;
-	XMStoreFloat3(&fRayOrigin, vecRayOrigin);
-	_MovePickOrigin.x = _prevPickOrigin.x - fRayOrigin.x;
-	_MovePickOrigin.y = _prevPickOrigin.y - fRayOrigin.y;
-	_prevPickOrigin = fRayOrigin;
+	_MovePickOrigin.x = _prevPickOrigin.x - vecRayOrigin.x;
+	_MovePickOrigin.y = _prevPickOrigin.y - vecRayOrigin.y;
+	_prevPickOrigin = vecRayOrigin;
 
-	return bBox.Intersects(vecRayOrigin, XMVector3Normalize(vecRayDir), dist);
+	return bBox.Intersects(vecRayOrigin, vecRayDir, dist);
 }
 
 void PickingManager::Update()
@@ -119,7 +117,7 @@ void PickingManager::Update()
 	//			box.Center.x += pTransform->GetLook().x * lineLength;
 	//			box.Center.y += pTransform->GetLook().y * lineLength;
 	//			box.Center.z += pTransform->GetLook().z * lineLength;
-	//			box.Extents = XMFLOAT3(extents, extents, extents);
+	//			box.Extents = acm::float3(extents, extents, extents);
 
 	//			if(RayPick(InputManager::This().GetMousePosX(), InputManager::This().GetMousePosY(), box, dist))
 	//			{
@@ -148,7 +146,7 @@ void PickingManager::Update()
 	//				test = true;
 	//			}
 
-	//			XMMATRIX invMatViewProj = XMMatrixInverse(&XMMatrixDeterminant(CameraManager::This().GetCurrentCameraViewProj()), CameraManager::This().GetCurrentCameraViewProj());
+	//			acm::float4x4 invMatViewProj = acm::float4x4Inverse(&acm::float4x4Determinant(CameraManager::This().GetCurrentCameraViewProj()), CameraManager::This().GetCurrentCameraViewProj());
 	//			
 	//			float vx = (float)InputManager::This().GetMousePosX() / (float)RenderDevice::This().GetWidth() * 2.0f - 1.f;
 	//			float vy = (float)InputManager::This().GetMousePosY() / (float)RenderDevice::This().GetHeight() * -2.0f + 1.f;
@@ -157,13 +155,13 @@ void PickingManager::Update()
 	//			//XMVECTOR vecNewRay = XMVector3TransformNormal(XMVectorSet(vx, vy, newvz, 0.0f), invMatView) + XMVector3TransformCoord(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), invMatView);
 	//			XMVECTOR tposition = XMLoadFloat3(&pTransform->GetPosition());
 	//			tposition = XMVector3TransformCoord(tposition, CameraManager::This().GetCurrentCameraViewProj());
-	//			XMFLOAT4 newvz;
+	//			acm::float4 newvz;
 	//			XMStoreFloat4(&newvz, tposition);
 
 	//			XMVECTOR vecNewRay = XMVector3TransformCoord(XMVectorSet(vx, vy, newvz.z, 1.0f), invMatViewProj);
 	//			float MoveDist1 = 0;
 
-	//			XMFLOAT3 debug;
+	//			acm::float3 debug;
 	//			XMStoreFloat3(&debug, vecNewRay);
 
 	//			XMStoreFloat(&MoveDist1, XMVector3Dot(vecNewRay - _vecOldRay, XMLoadFloat3(&pTransform->GetRight())));
@@ -175,12 +173,12 @@ void PickingManager::Update()
 	//					if(abs(MoveDist1) > 0.f)
 	//					{
 	//						char test[100] = "";
-	//						XMFLOAT3 tttt;
+	//						acm::float3 tttt;
 	//						XMStoreFloat3(&tttt, vecNewRay - _vecOldRay);
 	//						sprintf_s(test, "test = %.2f, %.2f, %.2f\n", tttt.x, tttt.y, tttt.z);
 	//						ATLTRACE(test);
 	//					}
-	//					XMFLOAT3 position = pTransform->GetPosition();
+	//					acm::float3 position = pTransform->GetPosition();
 	//					position.x += MoveDist1;
 	//					pTransform->SetPosition(position);
 	//				}

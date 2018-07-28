@@ -4,10 +4,10 @@
 class BOX
 {
 public:
-	BOX(DirectX::XMFLOAT3 min, DirectX::XMFLOAT3 max) {};
-	~Box() {};
+	BOX(acm::float3 min, acm::float3 max) {};
+	~BOX() {};
 
 public:
-	DirectX::XMFLOAT3 min;
-	DirectX::XMFLOAT3 max;
+	acm::float3 min;
+	acm::float3 max;
 };

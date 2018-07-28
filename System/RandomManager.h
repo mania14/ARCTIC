@@ -8,7 +8,7 @@
 
 #pragma once
 #include "../CommonUtil/Singletone.h"
-#include "DirectXMath.h"
+#include "../CommonUtil/Math.h"
 
 class RandomManager : public Singletone<RandomManager>
 {
@@ -16,5 +16,5 @@ public:
 	void InitWELLRNG512a();
 	double WELLRNG512a(void);
 
-	DirectX::XMFLOAT3 RandomNormal();
+	acm::float3 RandomNormal();
 };

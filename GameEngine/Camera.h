@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-static const XMFLOAT3 POSITIVE_Y = XMFLOAT3(0, 1, 0);
+static const acm::float3 POSITIVE_Y = acm::float3(0, 1, 0);
 
 class Camera : public GameObject
 {
@@ -20,7 +20,7 @@ public:
 	void Destroy() override;
 
 	void SetCameraProjectProperty(const float Fov, const float Aspect, const float Near, const float Far);
-	void SetCameraViewProperty(const XMFLOAT3* Eye, const XMFLOAT3* At, const XMFLOAT3* Up);
+	void SetCameraViewProperty(const acm::float3* Eye, const acm::float3* At, const acm::float3* Up);
 	void SetFov(const float Fov) { _FovY = Fov; };
 	void SetAspect(const float Aspect) { _Aspect = Aspect; };
 	void SetNear(const float Near) { _Near = Near; };
@@ -31,17 +31,17 @@ public:
 	float GetNear() { return _Near; };
 	float GetFar() { return _Far; };
 
-	XMVECTOR GetPosition() {
+	acm::float3 GetPosition() {
 		return _vEye;
 	};
 
-	XMVECTOR GetAt() {
+	acm::float3 GetAt() {
 		return _vAt;
 	};
 
-	const XMMATRIX& GetView();
-	const XMMATRIX& GetProj();
-	const XMMATRIX& GetViewProj();
+	const acm::float4x4& GetView();
+	const acm::float4x4& GetProj();
+	const acm::float4x4& GetViewProj();
 
 protected:
 	float			_FovY;
@@ -49,11 +49,11 @@ protected:
 	float			_Near;
 	float			_Far;
 	
-	XMVECTOR		_vEye;
-	XMVECTOR		_vAt;
-	XMVECTOR		_vUp;
+	acm::float3		_vEye;
+	acm::float3		_vAt;
+	acm::float3		_vUp;
 
-	XMMATRIX		_mView;
-	XMMATRIX		_mProj;
-	XMMATRIX		_mViewProj;
+	acm::float4x4		_mView;
+	acm::float4x4		_mProj;
+	acm::float4x4		_mViewProj;
 };

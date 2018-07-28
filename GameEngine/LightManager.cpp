@@ -40,17 +40,21 @@ void LightManager::Render()
 	RenderDevice::This().GetRawVariableByName("gNormalTex")->AsShaderResource()->SetResource(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_NORMAL)->m_pResourceView);
 	RenderDevice::This().GetRawVariableByName("gSpecTex")->AsShaderResource()->SetResource(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_SPECPOWER)->m_pResourceView);
 
-	const XMMATRIX pProj = CameraManager::This().GetCurrentCamera()->GetProj();
-	XMFLOAT4 PerspectiveValues;
-	XMFLOAT3 temp;
-	XMStoreFloat3(&temp, pProj.r[0]); PerspectiveValues.x = 1.0f / temp.x;
+	acm::float4 PerspectiveValues;
+	//const acm::float4x4 pProj = CameraManager::This().GetCurrentCamera()->GetProj();
+	//acm::float3 temp;
+
+	/*XMStoreFloat3(&temp, pProj.r[0]); PerspectiveValues.x = 1.0f / temp.x;
 	XMStoreFloat3(&temp, pProj.r[1]); PerspectiveValues.y = 1.0f / temp.y;
 	XMStoreFloat3(&temp, pProj.r[3]); PerspectiveValues.z = temp.z;
-	XMStoreFloat3(&temp, pProj.r[2]); PerspectiveValues.w = -temp.z;
-	RenderDevice::This().GetRawVariableByName("PerspectiveValues")->AsVector()->SetRawValue(&PerspectiveValues, 0, sizeof(XMFLOAT4));
+	XMStoreFloat3(&temp, pProj.r[2]); PerspectiveValues.w = -temp.z;*/
+	PerspectiveValues.x = 1.0f / CameraManager::This().GetCurrentCamera()->GetProj()._11;
+	PerspectiveValues.y = 1.0f / CameraManager::This().GetCurrentCamera()->GetProj()._22;
+	PerspectiveValues.z = CameraManager::This().GetCurrentCamera()->GetProj()._33;
+	PerspectiveValues.w = -CameraManager::This().GetCurrentCamera()->GetProj()._33;
+	RenderDevice::This().GetRawVariableByName("PerspectiveValues")->AsVector()->SetRawValue(&PerspectiveValues, 0, sizeof(acm::float4));
 
-	const XMMATRIX pView = CameraManager::This().GetCurrentCamera()->GetView();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(pView), pView);
+	acm::float4x4 invView = CameraManager::This().GetCurrentCamera()->GetView().inverse_val();
 	RenderDevice::This().GetVariableByName("ViewInv")->SetMatrix(reinterpret_cast<float*>(&invView));
 
 	RenderDevice::This().GetContext()->IASetInputLayout(NULL);

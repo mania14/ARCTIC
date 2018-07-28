@@ -18,6 +18,7 @@
 //#define ENGINE_EXPORTS
 #include <algorithm>
 #include "../CommonUtil/CommonDefine.h"
+#include "../CommonUtil/Math.h"
 #include "DirectXMath.h"
 #include <vector>
 #include <string>

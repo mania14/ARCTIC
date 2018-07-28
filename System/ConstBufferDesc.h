@@ -1,29 +1,26 @@
 #pragma once
 #include <windows.h>
-#include "DirectXMath.h"
-
-using namespace DirectX;
 
 struct CBufferLight
 {
-	CBufferLight() { ZeroMemory(this, sizeof(this)); };
-	XMFLOAT4 _ambient;
-	XMFLOAT4 _diffuse;
-	XMFLOAT4 _specular;
-	XMFLOAT3 _direction;
-	float	 _range;
-	XMFLOAT3 _attenuation;
-	float	 _spot;
-	XMFLOAT3 _position;
-	float	 _dummy;
+	CBufferLight() { ZeroMemory(this, sizeof(CBufferLight)); };
+	acm::float4 _ambient;
+	acm::float4 _diffuse;
+	acm::float4 _specular;
+	acm::float3 _direction;
+	float	    _range;
+	acm::float3 _attenuation;
+	float	    _spot;
+	acm::float3 _position;
+	float	    _dummy;
 };
 
 struct Material
 {
-	Material() { ZeroMemory(this, sizeof(this)); }
+	Material() { ZeroMemory(this, sizeof(Material)); }
 
-	XMFLOAT4 Ambient;
-	XMFLOAT4 Diffuse;
-	XMFLOAT4 Specular; // w = SpecPower
-	XMFLOAT4 Reflect;
+	acm::float4 Ambient;
+	acm::float4 Diffuse;
+	acm::float4 Specular; // w = SpecPower
+	acm::float4 Reflect;
 };

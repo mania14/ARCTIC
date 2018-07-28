@@ -4,24 +4,24 @@
 #include "RenderTargetManager.h"
 #include "TextureManager.h"
 #include "CameraManager.h"
-#include "Terrain.h"
+//#include "Terrain.h"
 
 void TerrainMakerManager::Init()
 {
 	_TerrainVoxelVertexLookUpTable.resize(12);
 	{
-		_TerrainVoxelVertexLookUpTable[0] = XMFLOAT3(0.0f, 0.5f, 0.0f);
-		_TerrainVoxelVertexLookUpTable[1] = XMFLOAT3(0.5f, 1.0f, 0.0f);
-		_TerrainVoxelVertexLookUpTable[2] = XMFLOAT3(1.0f, 0.5f, 0.0f);
-		_TerrainVoxelVertexLookUpTable[3] = XMFLOAT3(0.5f, 0.0f, 0.0f);
-		_TerrainVoxelVertexLookUpTable[4] = XMFLOAT3(0.0f, 0.5f, 1.0f);
-		_TerrainVoxelVertexLookUpTable[5] = XMFLOAT3(0.5f, 1.0f, 1.0f);
-		_TerrainVoxelVertexLookUpTable[6] = XMFLOAT3(1.0f, 0.5f, 1.0f);
-		_TerrainVoxelVertexLookUpTable[7] = XMFLOAT3(0.5f, 0.0f, 1.0f);
-		_TerrainVoxelVertexLookUpTable[8] = XMFLOAT3(0.0f, 0.0f, 0.5f);
-		_TerrainVoxelVertexLookUpTable[9] = XMFLOAT3(0.0f, 1.0f, 0.5f);
-		_TerrainVoxelVertexLookUpTable[10] = XMFLOAT3(1.0f, 1.0f, 0.5f);
-		_TerrainVoxelVertexLookUpTable[11] = XMFLOAT3(1.0f, 0.0f, 0.5f);
+		_TerrainVoxelVertexLookUpTable[0] = acm::float3(0.0f, 0.5f, 0.0f);
+		_TerrainVoxelVertexLookUpTable[1] = acm::float3(0.5f, 1.0f, 0.0f);
+		_TerrainVoxelVertexLookUpTable[2] = acm::float3(1.0f, 0.5f, 0.0f);
+		_TerrainVoxelVertexLookUpTable[3] = acm::float3(0.5f, 0.0f, 0.0f);
+		_TerrainVoxelVertexLookUpTable[4] = acm::float3(0.0f, 0.5f, 1.0f);
+		_TerrainVoxelVertexLookUpTable[5] = acm::float3(0.5f, 1.0f, 1.0f);
+		_TerrainVoxelVertexLookUpTable[6] = acm::float3(1.0f, 0.5f, 1.0f);
+		_TerrainVoxelVertexLookUpTable[7] = acm::float3(0.5f, 0.0f, 1.0f);
+		_TerrainVoxelVertexLookUpTable[8] = acm::float3(0.0f, 0.0f, 0.5f);
+		_TerrainVoxelVertexLookUpTable[9] = acm::float3(0.0f, 1.0f, 0.5f);
+		_TerrainVoxelVertexLookUpTable[10] = acm::float3(1.0f, 1.0f, 0.5f);
+		_TerrainVoxelVertexLookUpTable[11] = acm::float3(1.0f, 0.0f, 0.5f);
 	}
 
 	_TerrainVoxelIdxLookUpTable.resize(256);
@@ -579,9 +579,9 @@ void TerrainMakerManager::Init()
 		HR(RenderDevice::This().GetDevice()->CreateBuffer(&vIdxBufferDesc, &iIdxInitData, &_TerrainCellMeshLookUpBuffer[i].vIBuffer), L"CreateBuffer Index Terrain Buffer Fail");
 	}
 
-	pTerrain = new Terrain();
+	//pTerrain = new Terrain();
 
-	pTerrain->Init();
+	//pTerrain->Init();
 }
 
 void TerrainMakerManager::MakeHeightMap(int x, int y, std::string filename)
@@ -610,7 +610,7 @@ void TerrainMakerManager::Render()
 	//	UINT stride = sizeof(Vertex_Debug);
 	//	UINT offset = 0;
 
-	//	XMMATRIX worldviewproj = CameraManager::This().GetCurrentCameraViewProj();
+	//	acm::float4x4 worldviewproj = CameraManager::This().GetCurrentCameraViewProj();
 
 	//	RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//	RenderDevice::This().GetContext()->OMSetDepthStencilState(RenderStates::This().NoUseDepthStencilDSS, 0);
@@ -618,13 +618,13 @@ void TerrainMakerManager::Render()
 	//	RenderDevice::This().GetContext()->IASetIndexBuffer(_TerrainCellMeshLookUpBuffer[1].vIBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	//	RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
-	//	RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&XMFLOAT3(1,0,0), 0, sizeof(XMFLOAT3));
+	//	RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&acm::float3(1,0,0), 0, sizeof(acm::float3));
 	//	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 
 	//	RenderDevice::This().GetContext()->DrawIndexed((UINT)_TerrainVoxelIdxLookUpTable[1].size(), 0, 0);
 	//}
 
-	pTerrain->TestRender();
+	//pTerrain->TestRender();
 }
 
 void TerrainMakerManager::Release()

@@ -5,10 +5,10 @@
 
 //struct Plane
 //{
-//	XMFLOAT3				m_PointList[4];
-//	XMFLOAT3				m_Normal;
-//	XMFLOAT3				m_CenterPos;
-//	XMFLOAT3				GetInvNormal() { return XMFLOAT3(m_Normal.x * -1, m_Normal.y * -1, m_Normal.z * -1); };
+//	acm::float3				m_PointList[4];
+//	acm::float3				m_Normal;
+//	acm::float3				m_CenterPos;
+//	acm::float3				GetInvNormal() { return acm::float3(m_Normal.x * -1, m_Normal.y * -1, m_Normal.z * -1); };
 //	float					GetDistance() {
 //		float temp = 0.0f;
 //		XMStoreFloat(&temp, XMVector3Length(XMLoadFloat3(&m_CenterPos)));
@@ -19,8 +19,8 @@
 //struct OBB
 //{
 //	Plane					m_PlaneList[6];
-//	XMFLOAT3				m_CenterPosition;
-//	XMFLOAT3				m_Axis[3];
+//	acm::float3				m_CenterPosition;
+//	acm::float3				m_Axis[3];
 //};
 
 class Transform;
