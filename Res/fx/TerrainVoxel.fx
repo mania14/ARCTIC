@@ -1,21 +1,13 @@
-#include "DefaultLightFunc.fx"
 #include "VoxelTerrainLookUpTable.fxh"
+#include "Encode.fxh"
 
 static float3 up = { 0.0f, 1.0f, 0.0f };
-
-cbuffer cbPerFrame
-{
-	Light gDirLight;
-	PointLight gPointLight;
-	SpotLight gSpotLight;
-	float3 gEyePosW;
-};
 
 cbuffer cbPerTerrain
 {
 	float4x4 gViewProj;
-	Material gMaterial;
 };
+
 
 struct VertexIn
 {
@@ -27,32 +19,34 @@ struct GeoOut
 	float4 PosH		: SV_POSITION;
 	float3 PosW		: POSITION;
 	float3 Normal   : NORMAL;
+	float3 Tangent  : TANGENT;
+	float3 BiNormal : BINORMAL;
 	float2 Tex		: TEXCOORD;
 	uint   PrimeID	: SV_PrimitiveID;
 };
 
-// //Texture2DArray gTreeTexArray;
-// Texture2DArray gDiffuseMap;
-
-Texture3D volumeTex;
-SamplerState volumeTexSampler
+Texture2D texDiffuse;
+Texture2D texNormal;
+Texture3D texVolume;
+SamplerState volumeSampler
 {
 	Filter = MIN_MAG_MIP_POINT;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 };
-
-const float3 volumeTexWeight[8] = 
+SamplerState diffuseSampler
 {
-	float3(0, 0, 0),
-	float3(1, 0, 0),	
-	float3(1, 1, 0),
-	float3(0, 1, 0),
-	float3(0, 0, 1),
-	float3(1, 0, 1),
-	float3(1, 1, 1),
-	float3(0, 1, 1)
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
+SamplerState normalSampler
+{
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
+
 
 VertexIn VS(VertexIn IN)
 {
@@ -65,16 +59,18 @@ VertexIn VS(VertexIn IN)
 
 float calcDensityLerpValue( float density1, float density2 )
 {
-	return density1 / (max(density1, 0) + max(density2, 0));
+	return saturate( abs(density1) / (abs(density1) + abs(density2)) );
 }
 
-float3 calcNormal()
+float2 calcUV(float3 pos, float3 tangent, float3 binormal)
 {
-	float aroundDensity[6];
+	float u = (dot(pos, tangent) + 1 ) * 0.5f;
+	float v = (dot(pos, binormal) + 1 ) * 0.5f;
 
-	float3 accNormal;
-
-	return normalize(accNormal);
+	//float u = asin(pos.x) / 3.14159f + 0.5f;
+	//float v = asin(pos.y) / 3.14159f + 0.5f;
+	
+	return float2(u, v);
 }
 
 [maxvertexcount(15)]
@@ -85,16 +81,15 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 
 	for (int samplerIdx = 0; samplerIdx < 8; ++samplerIdx)
 	{
-		half4 voxelInfo = volumeTex.SampleLevel(volumeTexSampler, (gIn[0].VoxelInfo.xyz + volumeTexWeight[samplerIdx]) / 33.f, 0);
+		half4 voxelInfo = texVolume.SampleLevel(volumeSampler, (gIn[0].VoxelInfo.xyz + voxelTerrainPosLookUpTable[samplerIdx]) / g_VoxelSize, 0);
 		normal[samplerIdx] = voxelInfo.xyz;
-		density[samplerIdx] = voxelInfo.w;
+		density[samplerIdx] = (voxelInfo.w * 2) - 1;
 	}
-
-	GeoOut gout;
 
 	unsigned int meshIdx = ((unsigned int)(density[0] > 0) | (unsigned int)(density[1] > 0) << 1 | (unsigned int)(density[2] > 0) << 2 | (unsigned int)(density[3] > 0) << 3 | (unsigned int)(density[4] > 0) << 4 | (unsigned int)(density[5] > 0) << 5 | (unsigned int)(density[6] > 0) << 6 | (unsigned int)(density[7] > 0) << 7);
 	meshIdx = clamp(meshIdx, 0, 255);
 
+	GeoOut gout[3] = { (GeoOut)0, (GeoOut)0, (GeoOut)0 };
 	int triStripCount = 0;
 	for (int polyIdx = 0; polyIdx < 15; ++polyIdx)
 	{
@@ -104,92 +99,66 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 			break;
 		}
 
-		unsigned int voxelIndex0 = voxelTerrainIndexLookUpTable[lookUpIndex][0];
-		unsigned int voxelIndex1 = voxelTerrainIndexLookUpTable[lookUpIndex][1];
-
-		gout.PosW = lerp(voxelTerrainPosLookUpTable[voxelIndex0], voxelTerrainPosLookUpTable[voxelIndex1], calcDensityLerpValue(density[voxelIndex0], density[voxelIndex1]));
-		gout.PosW += gIn[0].VoxelInfo.xyz;
-		gout.PosH = mul(float4(gout.PosW, 1.f), gViewProj);
-
-
-
-		gout.Normal.x = (float)normal[0].x;
-		gout.Normal.y = (float)normal[0].y;
-		gout.Normal.z = (float)density[0];
-		gout.Tex = float2(1, 1);
-		gout.PrimeID = primeID;
-
-		triStream.Append(gout);
-		triStripCount++;
-
-		if( (triStripCount % 3) == 0 )
+		// 복셀의 위치, extraNoraml 계산은 각각 따로 합니다.
 		{
+			unsigned int voxelIndex0 = voxelTerrainIndexLookUpTable[lookUpIndex][0];
+			unsigned int voxelIndex1 = voxelTerrainIndexLookUpTable[lookUpIndex][1];
+			
+			float lerpDensity = calcDensityLerpValue(density[voxelIndex0], density[voxelIndex1]);
+			gout[triStripCount].PosW = lerp(voxelTerrainPosLookUpTable[voxelIndex0], voxelTerrainPosLookUpTable[voxelIndex1], lerpDensity);
+			//gout[triStripCount].Tex = lerp(voxelTerrainTexLookUpTable[voxelIndex0][0], voxelTerrainTexLookUpTable[voxelIndex1][1], lerpDensity);
+			//gout[triStripCount].Tex = float2(0,0);
+
+			// calc extra normal (추후에 다시 체크해봐야됨)
+			// {
+				// float  extraDensity[2];
+				// float3 extraNormal[2];
+
+				// extraDensity[0] = texVolume.SampleLevel(volumeSampler, (gIn[0].VoxelInfo.xyz + gout[triStripCount].PosW + voxelTerrainExtraDensityLookUpTable[lookUpIndex][0]) / g_VoxelSize, 0).w * 2 - 1;
+				// extraDensity[1] = texVolume.SampleLevel(volumeSampler, (gIn[0].VoxelInfo.xyz + gout[triStripCount].PosW + voxelTerrainExtraDensityLookUpTable[lookUpIndex][1]) / g_VoxelSize, 0).w * 2 - 1;
+				
+				// float whichDensity = density[voxelIndex0] < 0 ? density[voxelIndex0] : density[voxelIndex1];
+
+				// extraNormal[0] = normalize(voxelTerrainExtraDensityLookUpTable[lookUpIndex][0]) * calcDensityLerpValue(whichDensity, extraDensity[0]);
+				// extraNormal[1] = normalize(voxelTerrainExtraDensityLookUpTable[lookUpIndex][1]) * calcDensityLerpValue(whichDensity, extraDensity[1]);
+
+				// gout[triStripCount].Normal = extraNormal[0] + extraNormal[1];
+			// }
+			gout[triStripCount].PrimeID = primeID;
+
+			triStripCount++;
+		}
+
+		if( triStripCount >= 3 )
+		{
+			// 복셀의 mainNormal, 월드 계산은 삼각형이 완성될때 마다 합니다.
+			float3 mainNormal = normalize(cross(gout[2].PosW - gout[0].PosW, gout[1].PosW - gout[0].PosW));
+
+			for (int gIdx = 0; gIdx < 3; ++gIdx)
+			{
+				// 보조 노멀은 나중에
+				//gout[gIdx].Normal = normalize(mainNormal + gout[gIdx].Normal);
+				gout[gIdx].Normal = normalize(mainNormal);
+				calcTBFromN(gout[gIdx].Normal, gout[gIdx].Tangent, gout[gIdx].BiNormal);
+				gout[gIdx].Tex = calcUV(gout[gIdx].PosW, gout[gIdx].Tangent, gout[gIdx].BiNormal);
+				gout[gIdx].PosW += gIn[0].VoxelInfo.xyz;
+				gout[gIdx].PosH = mul(float4(gout[gIdx].PosW, 1.f), gViewProj);
+				triStream.Append(gout[gIdx]);
+			}
+		
 			triStream.RestartStrip();
+			triStripCount = 0;
 		}
 	}
-
-	//float3 look = gEyePosW - gIn[0].VoxelInfo;
-	//look.y = 0.0f;
-	//look = normalize(look);
-	//float3 right = cross(up, look);
-
-	//float4 v[4];
-	//v[0] = float4(gIn[0].VoxelInfo + 3 * right - 3 * up, 1.0f);
-	//v[1] = float4(gIn[0].VoxelInfo + 3 * right + 3 * up, 1.0f);
-	//v[2] = float4(gIn[0].VoxelInfo - 3 * right - 3 * up, 1.0f);
-	//v[3] = float4(gIn[0].VoxelInfo - 3 * right + 3 * up, 1.0f);
-
-	//GeoOut gout;
-	//[unroll]
-	//for (int j = 0; j < 4; ++j)
-	//{
-	//	gout.PosH = mul(v[j], gViewProj);
-	//	gout.PosW = v[j].xyz;
-	//	//gout.Normal = look;
-	//	gout.Normal.x = 1.f;
-	//	gout.Normal.y = 1.f;
-	//	gout.Normal.z = 1.f;
-	//	gout.Tex = float2(1,1);
-	//	gout.PrimeID = primeID;
-
-	//	triStream.Append(gout);
-	//}
-	
 }
 
-float4 PS(GeoOut IN) : SV_Target
+PS_GBUFFER_OUT PS(GeoOut IN)
 {
-	return float4(IN.Normal.zzz, 1.f);
-	IN.Normal = normalize(IN.Normal);
+	//float3 uvw = float3(IN.Tex, IN.TexID);
+	float3 normal = IN.Normal;
+	ClacNormalMap(texNormal.Sample(normalSampler, IN.Tex).xyz, IN.Tangent, IN.BiNormal, IN.Normal, normal);
 
-	float3 toEyeW = normalize(gEyePosW - IN.PosW);
-
-	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	float4 A, D, S;
-
-	CalcDirectionalLight(gMaterial, gDirLight, IN.Normal, toEyeW, A, D, S);
-	ambient += A;
-	diffuse += D;
-	specular += S;
-
-	//CalcPointLight(gMaterial, gPointLight, IN.PosW, IN.Normal, toEyeW, A, D, S);
-	//ambient += A;
-	//diffuse += D;
-	//specular += S;
-
-	//float4 texColor = gDiffuseMap.Sample(DefaultSampler, IN.Tex);
-	float3 uvw = float3(IN.Tex, IN.PrimeID % 4);
-	float4 texColor = float4(1, 0, 0, 1);
-
-	float4 litColor = texColor * (ambient + diffuse) + specular;
-	litColor.a = texColor.a;
-
-	//clip(texColor.a - 0.1f);
-
-	return float4(1,1,1, 1.f);
+	return PackGBufferFunc(texDiffuse.Sample(diffuseSampler, IN.Tex).xyz, normal, 1.f, 1.f);
 }
 
 technique11 TerrainVoxelTech

@@ -336,13 +336,13 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
-			worldviewproj = MakeQuaternionToRotateMatrix(float3(0, DEGREE_TO_RADIAN * 90, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeRotateMatrix(float3(0, DEGREE_TO_RADIAN * 90, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(float3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
-			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(float3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
@@ -365,13 +365,13 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw(_pGizmo->PositionGizmoCount, 0);
 
-			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(XMFLOAT3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 			RenderDevice::This().GetContext()->Draw(_pGizmo->PositionGizmoCount, 0);
 
-			worldviewproj = MakeQuaternionToRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
+			worldviewproj = MakeRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(XMFLOAT3));
 			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());

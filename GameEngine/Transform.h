@@ -50,6 +50,7 @@ private:
 	float3	_Position;
 	float3	_Scale;
 	float3	_Rotation;
+	float3	_RotationDelta;
 	float3	_Look;
 	float3	_Up;
 	float3	_Right;

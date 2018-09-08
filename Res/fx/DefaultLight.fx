@@ -40,6 +40,8 @@ float4 LightDefault_PS(VS_OUTPUT In) : SV_Target
 	float4 color = diffuse + specular + ambient;
 	color.a = 1;
 
+	color.xyz = Gdata.Color;
+
 	return color;
 
 	//CalcPointLight(gMaterial, gPointLight, IN.PosW, IN.Normal, toEyeW, A, D, S);

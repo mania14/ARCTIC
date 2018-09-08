@@ -351,12 +351,16 @@ namespace acm
 		return M;
 	}
 
-	static float4x4 MakeQuaternionToRotateMatrix(const float3& q1)
+	static float4x4 MakeRotateMatrix(const float3& q1)
 	{
 		using namespace DirectX;
-		XMVECTOR Q = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&q1));
+		//XMVECTOR Q = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&q1));
+		//XMVECTOR Q = XMQuaternionRotationRollPitchYaw(q1.x, q1.y, q1.z);
+		//XMVECTOR Q = XMMatrixRotationRollPitchYaw(q1.x, q1.y, q1.z);
 		float4x4 M;
-		XMStoreFloat4x4(&M, XMMatrixRotationQuaternion(Q));
+		XMStoreFloat4x4(&M, XMMatrixRotationRollPitchYaw(q1.x, q1.y, q1.z));
+
+		//XMStoreFloat4x4(&M, XMMatrixRotationRollPitchYaw(q1.x, q1.y, q1.z));
 		return M;
 	}
 

@@ -32,25 +32,45 @@ int Transform::Init()
 
 int Transform::Update()
 {
-	_Rotation.x = _Rotation.x >= 360.f ? 0 : _Rotation.x;
-	_Rotation.y = _Rotation.y >= 360.f ? 0 : _Rotation.y;
-	_Rotation.z = _Rotation.z >= 360.f ? 0 : _Rotation.z;
+	_Rotation += _RotationDelta;
+
+	if (_Rotation.x >= 360)
+	{
+		_Rotation.x = _Rotation.x - 360;
+	}
+	if (_Rotation.x < 0)
+	{
+		_Rotation.x = 360 + _Rotation.x;
+	}
+	if (_Rotation.y >= 360)
+	{
+		_Rotation.y = _Rotation.y - 360;
+	}
+	if (_Rotation.y < 0)
+	{
+		_Rotation.y = 360 + _Rotation.y;
+	}
+
+	_Rotation.z = _Rotation.z >= 360.f ? _Rotation.z - 360 : _Rotation.z;
 	
-	float3 fRotation = _Rotation * DEGREE_TO_RADIAN;
+	float3 fRotation = _RotationDelta * DEGREE_TO_RADIAN;
 
 	//XMVECTOR vRotation = XMLoadFloat3(&fRotation);
 	//XMVECTOR vPosition = XMLoadFloat3(&_Position);
 
-	float4x4 mRotation = MakeQuaternionToRotateMatrix(fRotation);
-	_Right = float3(mRotation._11, mRotation._21, mRotation._31);
-	_Up = float3(mRotation._12, mRotation._22, mRotation._32);
-	_Look = float3(mRotation._13, mRotation._23, mRotation._33);
+	float4x4 mRotation = MakeRotateMatrix(fRotation);
 
-	_mWorld = mRotation;
+	_mWorld *= mRotation;
 	_mWorld._41 = _Position.x;
 	_mWorld._42 = _Position.y;
 	_mWorld._43 = _Position.z;
 	_mWorld._44 = 1.f;
+
+	_Right = float3(_mWorld._11, _mWorld._21, _mWorld._31);
+	_Up = float3(_mWorld._12, _mWorld._22, _mWorld._32);
+	_Look = float3(_mWorld._13, _mWorld._23, _mWorld._33);
+
+	_RotationDelta = float3(0, 0, 0);
 
 	return 0;
 }
@@ -84,7 +104,8 @@ const float3& Transform::GetScale()
 
 void Transform::SetRotation(const float3 & rotation)
 {
-	_Rotation = rotation;
+	//_Rotation = rotation;
+	_RotationDelta = _Rotation - rotation;
 }
 
 const float3& Transform::GetRotation()
