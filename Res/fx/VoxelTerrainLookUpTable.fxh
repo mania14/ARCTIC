@@ -1,12 +1,16 @@
+static float g_VoxelSize = 33.f;
+
 uniform unsigned int voxelTerrainIndexLookUpTable[12][2] = {	
 	{ 0, 1 },
 	{ 1, 2 },
 	{ 3, 2 },
 	{ 0, 3 },
+	
 	{ 4, 5 },
 	{ 5, 6 },
 	{ 7, 6 },
 	{ 4, 7 },
+	
 	{ 0, 4 },
 	{ 1, 5 },
 	{ 2, 6 },
@@ -21,7 +25,39 @@ uniform float3 voxelTerrainPosLookUpTable[8] = {
 	float3(0.f, 0.f, 1.f),
 	float3(1.f, 0.f, 1.f),
 	float3(1.f, 1.f, 1.f),
-	float3(0.f, 1.f, 1.f),
+	float3(0.f, 1.f, 1.f)
+};
+
+uniform float2 voxelTerrainTexLookUpTable[12][2] = {
+	{float2(0.f, 0.f), float2(1.f, 0.f)},
+	{float2(1.f, 0.f), float2(1.f, 1.f)},
+	{float2(0.f, 1.f), float2(1.f, 1.f)},
+	{float2(0.f, 0.f), float2(0.f, 1.f)},
+	
+	{float2(0.f, 0.f), float2(1.f, 0.f)},
+	{float2(1.f, 0.f), float2(1.f, 1.f)},
+	{float2(0.f, 1.f), float2(1.f, 1.f)},
+	{float2(0.f, 0.f), float2(0.f, 1.f)},
+	
+	{float2(0.f, 0.f), float2(1.f, 0.f)},
+	{float2(1.f, 0.f), float2(1.f, 1.f)},
+	{float2(0.f, 1.f), float2(1.f, 1.f)},
+	{float2(0.f, 0.f), float2(0.f, 1.f)},
+};
+
+uniform float3 voxelTerrainExtraDensityLookUpTable[12][2] = {
+	{ float3(0.f, -1.f, 0.f), float3(0.f, 0.f, -1.f) },
+	{ float3(1.f, 0.f, 0.f), float3(0.f, 0.f, -1.f) },
+	{ float3(0.f, 1.f, 0.f), float3(0.f, 0.f, -1.f) },
+	{ float3(-1.f, 0.f, 0.f), float3(0.f, 0.f, -1.f) },
+	{ float3(0.f, -1.f, 0.f), float3(0.f, 0.f, 1.f) },
+	{ float3(1.f, 0.f, 0.f), float3(0.f, 0.f, 1.f) },
+	{ float3(0.f, 1.f, 0.f), float3(0.f, 0.f, 1.f) },
+	{ float3(-1.f, 0.f, 0.f), float3(0.f, 0.f, 1.f) },
+	{ float3(-1.f, 0.f, 0.f), float3(0.f, -1.f, 0.f) },
+	{ float3(1.f, 0.f, 0.f), float3(0.f, -1.f, 0.f) },
+	{ float3(1.f, 0.f, 0.f), float3(0.f, 1.f, 0.f) },
+	{ float3(-1.f, 0.f, 0.f), float3(0.f, 1.f, 0.f) }
 };
 
 uniform unsigned int voxelTerrainLookUpTable[256][15] = {

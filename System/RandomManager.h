@@ -17,4 +17,6 @@ public:
 	double WELLRNG512a(void);
 
 	acm::float3 RandomNormal();
+	int RandomRange(int min, int max);
+	float RandomRange(float min, float max);
 };

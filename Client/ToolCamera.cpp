@@ -29,8 +29,8 @@ void ToolCamera::Update()
 	if(GetAsyncKeyState(VK_RBUTTON) & 0x8001)
 	{
 		// 회전 카메라 이상함
-		rotate.y += InputManager::This().GetMoveMousePosX() * GameTimer::This().DeltaTime() * 100;
-		rotate.x += InputManager::This().GetMoveMousePosY() * GameTimer::This().DeltaTime() * 100;
+		rotate.y += InputManager::This().GetMoveMousePosX() * GameTimer::This().DeltaTime() * 50;
+		rotate.x += InputManager::This().GetMoveMousePosY() * GameTimer::This().DeltaTime() * 50;
 	}
 
 	if (GetAsyncKeyState(VK_UP) & 0x8001)

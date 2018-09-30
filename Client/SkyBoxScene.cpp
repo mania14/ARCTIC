@@ -48,9 +48,9 @@ int SkyBoxScene::Init()
 	//	AddGameObject(OBJECT_STATIC, box);
 	//}
 
-	Terrain* pTerrain = new Terrain();
-	pTerrain->Create();
-	AddGameObject(OBJECT_STATIC, pTerrain);
+	//Terrain* pTerrain = new Terrain();
+	//pTerrain->Create();
+	//AddGameObject(OBJECT_STATIC, pTerrain);
 	
 	LightObject* pLightObj = new LightObject();
 	pLightObj->Create();
@@ -118,8 +118,6 @@ int SkyBoxScene::Render()
 		}
 		RenderDevice::This().End(rtDesc);
 	}
-
-	RenderDevice::This().GetSwapChain()->Present(0, 0);
 
 	return 0;
 }

@@ -14,7 +14,11 @@ ArcticView::ArcticView()
 
 void ArcticView::Initialize()
 {
-	
+}
+
+int ArcticView::getViewFPSInfo()
+{
+	return GetFPSInfo();
 }
 
 

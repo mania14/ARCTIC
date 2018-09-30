@@ -1,3 +1,4 @@
+#include "Common.fxh"
 #include "VoxelTerrainLookUpTable.fxh"
 #include "Encode.fxh"
 
@@ -7,7 +8,6 @@ cbuffer cbPerTerrain
 {
 	float4x4 gViewProj;
 };
-
 
 struct VertexIn
 {
@@ -47,6 +47,7 @@ SamplerState normalSampler
 	AddressV = Wrap;
 };
 
+int3 iSectorIndex;
 
 VertexIn VS(VertexIn IN)
 {
@@ -87,6 +88,10 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 	}
 
 	unsigned int meshIdx = ((unsigned int)(density[0] > 0) | (unsigned int)(density[1] > 0) << 1 | (unsigned int)(density[2] > 0) << 2 | (unsigned int)(density[3] > 0) << 3 | (unsigned int)(density[4] > 0) << 4 | (unsigned int)(density[5] > 0) << 5 | (unsigned int)(density[6] > 0) << 6 | (unsigned int)(density[7] > 0) << 7);
+	
+	if(meshIdx == 0 || meshIdx == 255)
+		return;
+	
 	meshIdx = clamp(meshIdx, 0, 255);
 
 	GeoOut gout[3] = { (GeoOut)0, (GeoOut)0, (GeoOut)0 };
@@ -142,6 +147,7 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 				calcTBFromN(gout[gIdx].Normal, gout[gIdx].Tangent, gout[gIdx].BiNormal);
 				gout[gIdx].Tex = calcUV(gout[gIdx].PosW, gout[gIdx].Tangent, gout[gIdx].BiNormal);
 				gout[gIdx].PosW += gIn[0].VoxelInfo.xyz;
+				gout[gIdx].PosW += iSectorIndex.xyz * (g_VoxelSize - 1);
 				gout[gIdx].PosH = mul(float4(gout[gIdx].PosW, 1.f), gViewProj);
 				triStream.Append(gout[gIdx]);
 			}
@@ -168,5 +174,9 @@ technique11 TerrainVoxelTech
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(CompileShader(gs_5_0, GS()));
 		SetPixelShader(CompileShader(ps_5_0, PS()));
+		
+		SetBlendState( NoBlend, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
+		SetRasterizerState(CCW);
+		SetDepthStencilState(UseDepth, 0);
 	}
 }

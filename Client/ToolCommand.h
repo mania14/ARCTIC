@@ -6,6 +6,7 @@ enum ToolCommand
 	ToolCommand_TransformPositionMode,
 	ToolCommand_TransformScaleMode,
 	ToolCommand_TransformRotationMode,
+	ToolCommand_GenerateTerrain,
 };
 
 class ToolCommandManager : public Singletone<ToolCommandManager>

@@ -2,6 +2,7 @@
 #include "d3dx11effect.h"
 #include "FXManager.h"
 #include "VertexDesc.h"
+#include "GameTimer.h"
 
 HWND RenderDevice::_hWnd = nullptr;
 
@@ -16,7 +17,9 @@ RenderDevice::RenderDevice(void)
 	_depthStencilResourceView(nullptr),
 	mPresentFX(nullptr),
 	_4xMsaaQuality(0),
-	_Enable4xMsaa(false)
+	_Enable4xMsaa(false),
+	_fps(0),
+	_ms(0)
 {
 }
 
@@ -371,10 +374,26 @@ ID3DX11EffectVariable* RenderDevice::GetRawVariableByName(const char* varname)
 }
 
 
-HRESULT RenderDevice::Render()
+HRESULT RenderDevice::Present()
 {
+	GameTimer::This().Tick();
 
-	return E_NOTIMPL;
+	static int frameCnt = 0;
+	static float timeElapsed = 0.0f;
+
+	frameCnt++;
+
+	// Compute averages over one second period.
+	if ((GameTimer::This().TotalTime() - timeElapsed) >= 1.0f)
+	{
+		_fps = (float)frameCnt; // fps = frameCnt / 1
+
+		// Reset for next average.
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
+
+	return _pSwapChain->Present(0, 0);
 }
 
 HRESULT RenderDevice::Begin(std::string fxindex, const int techIndex)

@@ -141,6 +141,14 @@ namespace acm
 		static float3 cross(const float3& lhs, const float3& rhs) {
 			return float3((lhs.y * rhs.z) - (lhs.z * rhs.y), (lhs.z * rhs.x) - (lhs.x * rhs.z), (lhs.x * rhs.y) - (lhs.y * rhs.x));
 		}
+		static float3 lerp(const float3& lhs, const float3& rhs, const float v)
+		{
+			using namespace DirectX;
+			XMVECTOR vResult = XMVectorLerp(XMLoadFloat3(&lhs), XMLoadFloat3(&rhs), v);
+			float3 result;
+			XMStoreFloat3(&result, vResult);
+			return result;
+		}
 		float3 normalize_val()
 		{
 			float length = sqrtf(float3::dot(*this, *this));
@@ -444,6 +452,16 @@ namespace acm
 			return *this;
 		}
 	};
+
+	inline float lerp(float value1, float value2, float amount)
+	{
+		return float(value1 + ((float)(value2 - value1) * amount));
+	}
+
+	inline float3 lerp(float3& value1, float3& value2, float amount)
+	{
+		return float3::lerp(value1, value2, amount);
+	}
 }
 //
 //static DirectX::XMMATRIX InverseTranspose(DirectX::CXMMATRIX M)

@@ -64,6 +64,9 @@ private:
 	UINT									_4xMsaaQuality;
 	bool									_Enable4xMsaa;
 
+	int										_fps;
+	int										_ms;
+
 private:
 	FxInfo*									mPresentFX;
 
@@ -77,7 +80,7 @@ public:
 	HRESULT									Begin(std::string fxIndex, const int techIndex = 0);
 	HRESULT									End(std::string fxIndex);
 
-	HRESULT									Render();
+	HRESULT									Present();
 	void									Release();
 
 	HWND									GetHandle() { return _hWnd; };
@@ -94,4 +97,7 @@ public:
 
 	const UINT								GetWidth() { return _Width; };
 	const UINT								GetHeight() { return _Height; };
+
+	const UINT								GetFPS() { return _fps; };
+	const UINT								GetMS() { return _ms; };
 };

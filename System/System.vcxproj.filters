@@ -136,9 +136,6 @@
     <FxCompile Include="..\Res\fx\TerrainMaker.fx">
       <Filter>소스 파일\FX</Filter>
     </FxCompile>
-    <FxCompile Include="..\Res\fx\Utill.fx">
-      <Filter>소스 파일\FX</Filter>
-    </FxCompile>
     <FxCompile Include="..\Res\fx\Debug.fx">
       <Filter>소스 파일\FX</Filter>
     </FxCompile>
@@ -148,9 +145,15 @@
     <FxCompile Include="..\Res\fx\TerrainVoxel.fx">
       <Filter>소스 파일\FX</Filter>
     </FxCompile>
+    <FxCompile Include="..\Res\fx\Utill.fxh">
+      <Filter>소스 파일\FX</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Res\fx\VoxelTerrainLookUpTable.fxh">
+      <Filter>소스 파일\FX</Filter>
+    </None>
+    <None Include="..\Res\fx\Common.fxh">
       <Filter>소스 파일\FX</Filter>
     </None>
   </ItemGroup>

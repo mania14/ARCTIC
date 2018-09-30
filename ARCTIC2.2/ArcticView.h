@@ -7,6 +7,8 @@ public:
 	ArcticView();
 	QPaintEngine* paintEngine() const { return NULL; };
 	void		  Initialize();
+
+	int			  getViewFPSInfo();
 protected:
 	void resizeEvent(QResizeEvent *event) override {
 

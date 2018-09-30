@@ -23,11 +23,6 @@ Terrain::~Terrain()
 
 void Terrain::Create()
 {
-	////Transform
-	//Transform* pTransform = new Transform();
-	//pTransform->Init();
-	//AddComponent(pTransform);
-
 	////¸Þ½¬
 	//Mesh* pMesh = new Mesh();
 	//MeshFactory::This().CreateGrid(128, 128, 0, *pMesh);
@@ -41,6 +36,12 @@ void Terrain::Create()
 	TerrainVoxel* pTerrain = new TerrainVoxel();
 	pTerrain->Init();
 	AddComponent(pTerrain);
+}
+
+void Terrain::SetSectorIndex(acm::int3 sectorIdx)
+{
+	TerrainVoxel* pTerrainVoxel = GetComponent<TerrainVoxel>();
+	pTerrainVoxel->SetSectorIndex(sectorIdx);
 }
 
 void Terrain::Update()
@@ -99,4 +100,10 @@ void Terrain::Render()
 void Terrain::Destroy()
 {
 	GameObject::Destroy();
+}
+
+void Terrain::SetVolumeTexture(Texture * pVolumeTexture)
+{
+	TerrainVoxel* pTerrainVoxel = GetComponent<TerrainVoxel>();
+	pTerrainVoxel->SetVolumeTexture(pVolumeTexture);
 }

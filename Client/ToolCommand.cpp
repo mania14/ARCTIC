@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ToolCommand.h"
 #include "ToolTransformManager.h"
+#include "ToolTerrainManager.h"
 
 ToolCommandManager::ToolCommandManager()
 {
@@ -27,6 +28,12 @@ int ToolCommandManager::executeCommand(ToolCommand command, void * input, void *
 		case ToolCommand_TransformRotationMode:
 		{
 			ToolTransformManager::This().setPickMode(ToolTransformManager::TOOL_TRANSFORM_ROTATE);
+			return 0;
+		}
+		case ToolCommand_GenerateTerrain:
+		{
+			acm::int3* terrainSize = (acm::int3*)input;
+			ToolTerrainManager::This().TerrainGenerate(terrainSize->x, terrainSize->y, terrainSize->z);
 			return 0;
 		}
 	}

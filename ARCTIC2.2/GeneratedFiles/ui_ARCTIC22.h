@@ -32,6 +32,8 @@ public:
     QAction *actionTransformPosition;
     QAction *actionTransformRotation;
     QAction *actionTransformScale;
+    QAction *actionTerrain;
+    QAction *menuTerrainTool;
     QWidget *MainLayout;
     QGridLayout *gridLayout;
     QTabWidget *RendererTabWidget;
@@ -51,13 +53,17 @@ public:
     {
         if (ARCTIC22Class->objectName().isEmpty())
             ARCTIC22Class->setObjectName(QStringLiteral("ARCTIC22Class"));
-        ARCTIC22Class->resize(1065, 717);
+        ARCTIC22Class->resize(1823, 1113);
         actionTransformPosition = new QAction(ARCTIC22Class);
         actionTransformPosition->setObjectName(QStringLiteral("actionTransformPosition"));
         actionTransformRotation = new QAction(ARCTIC22Class);
         actionTransformRotation->setObjectName(QStringLiteral("actionTransformRotation"));
         actionTransformScale = new QAction(ARCTIC22Class);
         actionTransformScale->setObjectName(QStringLiteral("actionTransformScale"));
+        actionTerrain = new QAction(ARCTIC22Class);
+        actionTerrain->setObjectName(QStringLiteral("actionTerrain"));
+        menuTerrainTool = new QAction(ARCTIC22Class);
+        menuTerrainTool->setObjectName(QStringLiteral("menuTerrainTool"));
         MainLayout = new QWidget(ARCTIC22Class);
         MainLayout->setObjectName(QStringLiteral("MainLayout"));
         gridLayout = new QGridLayout(MainLayout);
@@ -89,7 +95,7 @@ public:
         ARCTIC22Class->setCentralWidget(MainLayout);
         menuBar = new QMenuBar(ARCTIC22Class);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1065, 21));
+        menuBar->setGeometry(QRect(0, 0, 1823, 31));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuEdit = new QMenu(menuBar);
@@ -110,7 +116,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(MenuDock->sizePolicy().hasHeightForWidth());
         MenuDock->setSizePolicy(sizePolicy1);
-        MenuDock->setMinimumSize(QSize(300, 38));
+        MenuDock->setMinimumSize(QSize(400, 46));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         MenuDock->setWidget(dockWidgetContents);
@@ -119,6 +125,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
         menuBar->addAction(menuTool->menuAction());
+        menuTool->addAction(menuTerrainTool);
         mainToolBar->addAction(actionTransformPosition);
         mainToolBar->addAction(actionTransformRotation);
         mainToolBar->addAction(actionTransformScale);
@@ -146,6 +153,8 @@ public:
 #ifndef QT_NO_SHORTCUT
         actionTransformScale->setShortcut(QApplication::translate("ARCTIC22Class", "S", Q_NULLPTR));
 #endif // QT_NO_SHORTCUT
+        actionTerrain->setText(QApplication::translate("ARCTIC22Class", "Terrain", Q_NULLPTR));
+        menuTerrainTool->setText(QApplication::translate("ARCTIC22Class", "Terrain", Q_NULLPTR));
         RendererTabWidget->setTabText(RendererTabWidget->indexOf(PlayTabWidget), QApplication::translate("ARCTIC22Class", "Tab 1", Q_NULLPTR));
         RendererTabWidget->setTabText(RendererTabWidget->indexOf(Debug), QApplication::translate("ARCTIC22Class", "Tab 2", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("ARCTIC22Class", "File", Q_NULLPTR));

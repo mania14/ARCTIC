@@ -54,10 +54,6 @@ int Transform::Update()
 	_Rotation.z = _Rotation.z >= 360.f ? _Rotation.z - 360 : _Rotation.z;
 	
 	float3 fRotation = _RotationDelta * DEGREE_TO_RADIAN;
-
-	//XMVECTOR vRotation = XMLoadFloat3(&fRotation);
-	//XMVECTOR vPosition = XMLoadFloat3(&_Position);
-
 	float4x4 mRotation = MakeRotateMatrix(fRotation);
 
 	_mWorld *= mRotation;

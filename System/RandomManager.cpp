@@ -8,6 +8,7 @@
 
 #include "RandomManager.h"
 #include <stdlib.h>
+#include <algorithm>
 
 #define W 32
 #define R 16
@@ -61,5 +62,22 @@ acm::float3 RandomManager::RandomNormal()
 	acm::float3 value((float)WELLRNG512a(), (float)WELLRNG512a(), (float)WELLRNG512a());
 	value.normalize();
 	return value;
+}
+
+int RandomManager::RandomRange(int min, int max)
+{
+	int diff = abs(max - min);
+	float fValue = WELLRNG512a();
+	int value = (int)(fValue * 1000000);
+	value %= diff;
+
+	return value + std::min(min, max);
+}
+
+float RandomManager::RandomRange(float min, float max)
+{
+	int value = RandomRange((int)(min * 100000), (int)(max * 100000));
+
+	return (float)value / 100000.f;
 }
 
