@@ -180,7 +180,6 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TerrainMakerManager.h" />
     <ClInclude Include="TerrainVoxel.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
@@ -228,7 +227,6 @@
     </ClCompile>
     <ClCompile Include="TerrainMakerManager.cpp" />
     <ClCompile Include="TerrainVoxel.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>

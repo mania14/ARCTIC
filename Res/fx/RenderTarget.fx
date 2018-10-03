@@ -1,3 +1,4 @@
+#include "Common.fxh"
 
 Texture2D DepthTexture      : register(t0);
 Texture2D gColorTex			: register(t1);
@@ -17,20 +18,6 @@ static float2 arrOffsets[4] = {
 	float2(0.75, -0.75),
 };
 
-static const float2 arrBasePos[4] = {
-	float2(1.0, 1.0),
-	float2(1.0, -1.0),
-	float2(-1.0, 1.0),
-	float2(-1.0, -1.0),
-};
-
-static const float2 arrUV[4] = {
-	float2(1.0, 0.0),
-	float2(1.0, 1.0),
-	float2(0.0, 0.0),
-	float2(0.0, 1.0),
-};
-
 static const float4 arrMask[4] = {
 	float4(1.0, 0.0, 0.0, 0.0),
 	float4(0.0, 1.0, 0.0, 0.0),
@@ -38,25 +25,7 @@ static const float4 arrMask[4] = {
 	float4(0.0, 0.0, 0.0, 1.0),
 };
 
-struct VS_OUTPUT
-{
-	float4 Position	: SV_Position; // vertex position 
-	float2 UV		: TEXCOORD0;   // vertex texture coords
-	float4 sampMask	: TEXCOORD1;
-};
-
-VS_OUTPUT ScreenSquadVS(uint VertexID : SV_VertexID)
-{
-	VS_OUTPUT Output;
-
-	Output.Position = float4(arrBasePos[VertexID].xy, 0.0, 1.0);
-	Output.UV = arrUV[VertexID].xy;
-	Output.sampMask = arrMask[VertexID].xyzw;
-
-	return Output;
-}
-
-float4 ScreenSquadPS(VS_OUTPUT In) : SV_TARGET
+float4 ScreenSquadPS(ScreenSquadVS_Output In) : SV_TARGET
 {
 	//SURFACE_DATA gbd = UnpackGBuffer(In.UV.xy);
 	float4 finalColor = float4(1.0, 0.0, 0.0, 1.0);

@@ -455,7 +455,9 @@ namespace acm
 
 	inline float lerp(float value1, float value2, float amount)
 	{
-		return float(value1 + ((float)(value2 - value1) * amount));
+		float& lhs = (value1 > value2 ? value1 : value2);
+		float& rhs = (value1 < value2 ? value1 : value2);
+		return float(lhs + ((float)(rhs - lhs) * amount));
 	}
 
 	inline float3 lerp(float3& value1, float3& value2, float amount)

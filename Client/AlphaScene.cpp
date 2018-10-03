@@ -57,11 +57,11 @@ int AlphaScene::Update()
 
 int AlphaScene::Render()
 {
-	RenderDevice::This().Begin(RenderTargetManager::This().get);
+	//RenderDevice::This().Begin(RenderTargetManager::This().get);
 	{
 		BaseScene::Render();
 	}
-	RenderDevice::This().End();
+	//RenderDevice::This().End();
 
 	return 0;
 }

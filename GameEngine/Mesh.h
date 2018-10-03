@@ -1,7 +1,7 @@
 #include "Component.h"
 #include "../System/VertexDesc.h"
 #include "../System/RenderDevice.h"
-#include "Texture.h"
+#include "../System/Texture.h"
 #include <vector>
 
 struct MeshBuffer;
@@ -14,9 +14,9 @@ public:
 
 public:
 	enum TextureType {
-		TEXTURE_TYPE_DIFFUSE,
-		TEXTURE_TYPE_NORMAL,
-		TEXTURE_TYPE_EMMISIVE,
+		TEXTURE_SLOT0,
+		TEXTURE_SLOT1,
+		TEXTURE_SLOT2,
 		TEXTURE_TYPE_COUNT
 	};
 
@@ -36,6 +36,10 @@ public:
 	const size_t			GetIndicsCount() { return vecIndics.size(); };
 	const size_t			GetVertexCount() { return vecVertex.size(); };
 	const UINT				GetVertexSize() { return vertexSize; };
+	void					SetTexture(TextureType textureSlotNum, Texture* pTex);
+	Texture*				GetTexture(TextureType textureSlotNum) {
+		return pTexture[textureSlotNum];
+	};
 	void					Draw();
 	
 public:

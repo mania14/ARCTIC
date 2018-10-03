@@ -164,7 +164,8 @@ public:
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("VerticalBlur", VertexDescInfo(0, nullptr)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("PerlinNoise", VertexDescInfo(sizeof(Vertex_RenderTarget_Desc), Vertex_RenderTarget_Desc)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainTech", VertexDescInfo(sizeof(Vertex_VoxelTerrain_Instance_Desc), Vertex_VoxelTerrain_Instance_Desc)));
-		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainVoxelTech", VertexDescInfo(sizeof(Vertex_Voxel_Terrain_Desc), Vertex_Voxel_Terrain_Desc)));
+		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainVoxel", VertexDescInfo(sizeof(Vertex_Voxel_Terrain_Desc), Vertex_Voxel_Terrain_Desc)));
+		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("TerrainCombineNoise", VertexDescInfo(sizeof(Vertex_RenderTarget_Desc), Vertex_RenderTarget_Desc)));
 		m_vDescMap.insert(std::pair<std::string, VertexDescInfo>("DebugTech", VertexDescInfo(sizeof(Vertex_Debug_Desc), Vertex_Debug_Desc)));
 	};
 	~VertexDesc() {};

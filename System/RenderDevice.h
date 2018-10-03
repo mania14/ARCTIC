@@ -11,6 +11,7 @@
 //static const DirectX::XMVECTORF32 BackBufferColor = { 0.000000000f, 0.545098066f, 0.545098066f, 1.000000000f };
 static const DirectX::XMVECTORF32 BackBufferColor = { 0.f, 0.f, 0.0f, 0.f };
 
+class Texture;
 enum eRENDER_STATE
 {
 	eRS_WIREFRAME,
@@ -30,7 +31,7 @@ enum eRENDERTARGET_DEPTH_TYPE
 
 struct RenderTargetDesc
 {
-	std::vector<ID3D11RenderTargetView*>  _RenderTargetList;
+	std::vector<Texture*>				  _RenderTargetList;
 	eRENDERTARGET_DEPTH_TYPE			  _DepthType;
 };
 
@@ -69,6 +70,7 @@ private:
 
 private:
 	FxInfo*									mPresentFX;
+	RenderTargetDesc						mCurrentRenderTargetDesc;
 
 public:
 	HRESULT									InitDevice(HWND hWnd);
@@ -76,9 +78,10 @@ public:
 
 	void									SetRenderState(eRENDER_STATE renderstate);
 	void									Begin(RenderTargetDesc& rendertargetDesc);
-	void									End(RenderTargetDesc& rendertargetDesc);
-	HRESULT									Begin(std::string fxIndex, const int techIndex = 0);
-	HRESULT									End(std::string fxIndex);
+	void									End();
+	HRESULT									BeginFX(std::string fxIndex, const int techIndex = 0);
+	void									ApplyFX();
+	HRESULT									EndFX();
 
 	HRESULT									Present();
 	void									Release();
@@ -94,6 +97,8 @@ public:
 	ID3DX11EffectMatrixVariable*			GetVariableByName(const char* varname);
 	ID3DX11EffectVariable*					GetRawVariableByName(const char* varname);
 	ID3DX11EffectPass*						GetPassByIndex(const UINT index);
+
+	void									DrawQuad();
 
 	const UINT								GetWidth() { return _Width; };
 	const UINT								GetHeight() { return _Height; };

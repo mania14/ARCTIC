@@ -67,7 +67,7 @@ acm::float3 RandomManager::RandomNormal()
 int RandomManager::RandomRange(int min, int max)
 {
 	int diff = abs(max - min);
-	float fValue = WELLRNG512a();
+	float fValue = (float)WELLRNG512a();
 	int value = (int)(fValue * 1000000);
 	value %= diff;
 

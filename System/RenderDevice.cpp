@@ -3,6 +3,7 @@
 #include "FXManager.h"
 #include "VertexDesc.h"
 #include "GameTimer.h"
+#include "Texture.h"
 
 HWND RenderDevice::_hWnd = nullptr;
 
@@ -291,36 +292,43 @@ HRESULT RenderDevice::ResizeDevice()
 
 void RenderDevice::Begin(RenderTargetDesc& rendertargetDesc)
 {
+	ID3D11RenderTargetView* pRenderTargetViews[10];
+
 	UINT size = (UINT)rendertargetDesc._RenderTargetList.size();
 	for (UINT i = 0; i < size; ++i)
 	{
-		_pImmediateContext->ClearRenderTargetView(rendertargetDesc._RenderTargetList[i], BackBufferColor);
+		pRenderTargetViews[i] = rendertargetDesc._RenderTargetList[i]->m_pRenderTargetView;
+		//GetContext()->ClearRenderTargetView(rendertargetDesc._RenderTargetList[i]->m_pRenderTargetView, BackBufferColor);
 	}
 
 	switch(rendertargetDesc._DepthType)
 	{
 	case eRTDT_NO_USE_DEPTH:
-		_pImmediateContext->OMSetRenderTargets(size, &rendertargetDesc._RenderTargetList[0], NULL);
+		GetContext()->OMSetRenderTargets(size, pRenderTargetViews, NULL);
 		break;
 	case eRTDT_USE_READONLY_DEPTH:
-		_pImmediateContext->OMSetRenderTargets(size, &rendertargetDesc._RenderTargetList[0], _depthStencilView_ReadOnly);
+		GetContext()->OMSetRenderTargets(size, pRenderTargetViews, _depthStencilView_ReadOnly);
 		break;
 	case eRTDT_USE_DEPTH:
-		_pImmediateContext->OMSetRenderTargets(size, &rendertargetDesc._RenderTargetList[0], _depthStencilView);
-		_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		GetContext()->OMSetRenderTargets(size, pRenderTargetViews, _depthStencilView);
+		GetContext()->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		break;
 	default:
 		MessageBox(0, L"No setting Depth buffer type", 0, 0);
 		break;
 	}
+
+	mCurrentRenderTargetDesc = rendertargetDesc;
 }
 
-void RenderDevice::End(RenderTargetDesc& rendertargetDesc)
+void RenderDevice::End()
 {
 	// Little cleanup
-	UINT size = (UINT)rendertargetDesc._RenderTargetList.size();
-	ZeroMemory(&rendertargetDesc._RenderTargetList[0], sizeof(ID3D11RenderTargetView*) * size);
-	_pImmediateContext->OMSetRenderTargets(size, &rendertargetDesc._RenderTargetList[0], _depthStencilView);
+	ID3D11RenderTargetView* pRenderTargetViews[10];
+
+	UINT size = (UINT)mCurrentRenderTargetDesc._RenderTargetList.size();
+	ZeroMemory(&pRenderTargetViews, sizeof(ID3D11RenderTargetView*) * size);
+	GetContext()->OMSetRenderTargets(size, pRenderTargetViews, _depthStencilView);
 }
 
 ID3D11Device* RenderDevice::GetDevice()
@@ -363,6 +371,15 @@ ID3DX11EffectPass* RenderDevice::GetPassByIndex(const UINT index)
 	return mPresentFX->_FxTech->GetPassByIndex(index);
 }
 
+void RenderDevice::DrawQuad()
+{
+	RenderDevice::This().GetContext()->IASetInputLayout(NULL);
+	RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	RenderDevice::This().GetContext()->IASetVertexBuffers(0, 0, nullptr, 0, 0);
+	RenderDevice::This().ApplyFX();
+	RenderDevice::This().GetContext()->Draw(4, 0);
+}
+
 ID3DX11EffectMatrixVariable* RenderDevice::GetVariableByName(const char* varname)
 {
 	return mPresentFX->_FxEffect->GetVariableByName(varname)->AsMatrix();
@@ -386,7 +403,7 @@ HRESULT RenderDevice::Present()
 	// Compute averages over one second period.
 	if ((GameTimer::This().TotalTime() - timeElapsed) >= 1.0f)
 	{
-		_fps = (float)frameCnt; // fps = frameCnt / 1
+		_fps = frameCnt; // fps = frameCnt / 1
 
 		// Reset for next average.
 		frameCnt = 0;
@@ -396,24 +413,39 @@ HRESULT RenderDevice::Present()
 	return _pSwapChain->Present(0, 0);
 }
 
-HRESULT RenderDevice::Begin(std::string fxindex, const int techIndex)
+HRESULT RenderDevice::BeginFX(std::string fxindex, const int techIndex)
 {
 	mPresentFX = FXManager::This().GetFx(fxindex, techIndex);
 
 	if (!mPresentFX)
 	{
+		//assert
 		return E_FAIL;
 	}
 
-	_pImmediateContext->IASetInputLayout(mPresentFX->_InputLayer);
-	_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	GetContext()->IASetInputLayout(mPresentFX->_InputLayer);
+	GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	//RenderDevice::This().GetContext()->RSSetState(RenderStates::This().WireframeRS);
 
 	return S_OK;
 }
 
-HRESULT RenderDevice::End(std::string fxIndex)
+void RenderDevice::ApplyFX()
+{
+	D3D11_VIEWPORT viewportParam;
+	viewportParam.TopLeftX = 0;
+	viewportParam.TopLeftY = 0;
+	viewportParam.Width = (float)mCurrentRenderTargetDesc._RenderTargetList[0]->m_TextureSize.x;
+	viewportParam.Height = (float)mCurrentRenderTargetDesc._RenderTargetList[0]->m_TextureSize.y;
+	viewportParam.MinDepth = 0;
+	viewportParam.MaxDepth = 1.f;
+
+	GetContext()->RSSetViewports(1, &viewportParam);
+	GetPassByIndex(0)->Apply(0, GetContext());
+}
+
+HRESULT RenderDevice::EndFX()
 {
 	return S_OK;
 }

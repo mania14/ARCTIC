@@ -22,7 +22,7 @@ public:
 	bool CreateSphere(float radius, UINT numSubdivisions, Mesh& meshData);
 	bool CreateGeoSphere(float radius, UINT numSubdivisions, Mesh& meshData);
 	bool CreateBillboard(Billboard& _billboardData, std::vector<Vertex_Billboard>& _data);
-	bool CreateInstance(Mesh& meshData, Instancing& pInstance);
+	bool CreateInstance(Instancing & pInstance, UINT byteWidth, void* pData);
 	bool CreateFBXMesh(std::string FilePath, Mesh& meshData);
 private:
 	void Subdivide(Mesh& meshData, UINT numSubdivisions);

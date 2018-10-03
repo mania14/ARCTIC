@@ -57,8 +57,8 @@ void Box::Create()
 	//Texture* pCubeTexture = TextureManager::This().LoadTexture("../Res/Texture/SkyBox.dds");
 	//AddComponent(pCubeTexture);
 
-	pMesh->pTexture[Mesh::TEXTURE_TYPE_DIFFUSE] = TextureManager::This().LoadTexture("../Res/Texture/Sphere.dds");
-	pMesh->pTexture[Mesh::TEXTURE_TYPE_NORMAL] = TextureManager::This().LoadTexture("../Res/Texture/normal2.dds");
+	pMesh->pTexture[Mesh::TEXTURE_SLOT0] = TextureManager::This().LoadTexture("../Res/Texture/Sphere.dds");
+	pMesh->pTexture[Mesh::TEXTURE_SLOT1] = TextureManager::This().LoadTexture("../Res/Texture/normal2.dds");
 }
 
 void Box::Update()
@@ -74,7 +74,7 @@ void Box::Render()
 	float4x4 worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
 	float4x4 world = pTransform->GetWorldMatrix();
 	
-	RenderDevice::This().Begin("PackGBufferTech");
+	RenderDevice::This().BeginFX("PackGBufferTech");
 	{	
 		HRESULT hr;
 		hr = RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
@@ -83,7 +83,7 @@ void Box::Render()
 		RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
 		pMesh->Draw();
 	}
-	RenderDevice::This().End("PackGBufferTech");
+	RenderDevice::This().EndFX();
 
 	pTransform->RenderBox();
 	

@@ -25,9 +25,25 @@ struct GeoOut
 	uint   PrimeID	: SV_PrimitiveID;
 };
 
+struct TerrainCombineNoiseVS_Output
+{
+	float4 Position	: SV_Position; // vertex position 
+	uint   vIndex	: TEXCOORD0;
+};
+
+struct TerrainCombineNoiseGS_Output
+{
+	float4 Position	: SV_Position; // vertex position 
+	uint   Index	: SV_RenderTargetArrayIndex;
+	float2 UV		: TEXCOORD0;   // vertex texture coords
+};
+
+
 Texture2D texDiffuse;
 Texture2D texNormal;
 Texture3D texVolume;
+Texture3D texHighPitchNoise;
+
 SamplerState volumeSampler
 {
 	Filter = MIN_MAG_MIP_POINT;
@@ -46,10 +62,17 @@ SamplerState normalSampler
 	AddressU = Wrap;
 	AddressV = Wrap;
 };
+SamplerState noiseVolumeSampler
+{
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
 
 int3 iSectorIndex;
 
-VertexIn VS(VertexIn IN)
+VertexIn TerrainVoxelVS(VertexIn IN)
 {
 	VertexIn OUT;
 
@@ -75,7 +98,7 @@ float2 calcUV(float3 pos, float3 tangent, float3 binormal)
 }
 
 [maxvertexcount(15)]
-void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStream<GeoOut> triStream)
+void TerrainVoxelGS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStream<GeoOut> triStream)
 {
 	half3 normal[8];
 	half  density[8];
@@ -89,6 +112,7 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 
 	unsigned int meshIdx = ((unsigned int)(density[0] > 0) | (unsigned int)(density[1] > 0) << 1 | (unsigned int)(density[2] > 0) << 2 | (unsigned int)(density[3] > 0) << 3 | (unsigned int)(density[4] > 0) << 4 | (unsigned int)(density[5] > 0) << 5 | (unsigned int)(density[6] > 0) << 6 | (unsigned int)(density[7] > 0) << 7);
 	
+	[branch]
 	if(meshIdx == 0 || meshIdx == 255)
 		return;
 	
@@ -96,9 +120,12 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 
 	GeoOut gout[3] = { (GeoOut)0, (GeoOut)0, (GeoOut)0 };
 	int triStripCount = 0;
+	
+	[unroll]
 	for (int polyIdx = 0; polyIdx < 15; ++polyIdx)
 	{
 		unsigned int lookUpIndex = voxelTerrainLookUpTable[meshIdx][polyIdx];
+		[branch]
 		if (lookUpIndex < 0)
 		{
 			break;
@@ -158,7 +185,7 @@ void GS(point VertexIn gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStre
 	}
 }
 
-PS_GBUFFER_OUT PS(GeoOut IN)
+PS_GBUFFER_OUT TerrainVoxelPS(GeoOut IN)
 {
 	//float3 uvw = float3(IN.Tex, IN.TexID);
 	float3 normal = IN.Normal;
@@ -167,16 +194,81 @@ PS_GBUFFER_OUT PS(GeoOut IN)
 	return PackGBufferFunc(texDiffuse.Sample(diffuseSampler, IN.Tex).xyz, normal, 1.f, 1.f);
 }
 
-technique11 TerrainVoxelTech
+TerrainCombineNoiseVS_Output TerrainCombineNoiseVS(uint VertexID : SV_VertexID)
+{
+	TerrainCombineNoiseVS_Output output = (TerrainCombineNoiseVS_Output)0;
+	output.vIndex = VertexID;
+	return output;
+}
+
+[maxvertexcount(6)]
+void TerrainCombineNoiseGS(point TerrainCombineNoiseVS_Output gIn[1], uint primeID : SV_PrimitiveID, inout TriangleStream<TerrainCombineNoiseGS_Output> triStream)
+{	
+	TerrainCombineNoiseGS_Output output[6];
+
+	output[0].Position = float4(arrBasePos[3], 0, 1);
+	output[0].UV = arrUV[3];
+	output[0].Index = gIn[0].vIndex;
+	triStream.Append(output[0]);
+	output[1].Position = float4(arrBasePos[0], 0, 1);
+	output[1].UV = arrUV[0];
+	output[1].Index = gIn[0].vIndex;
+	triStream.Append(output[1]);
+	output[2].Position = float4(arrBasePos[1], 0, 1);
+	output[2].UV = arrUV[1];
+	output[2].Index = gIn[0].vIndex;
+	triStream.Append(output[2]);
+	
+	triStream.RestartStrip();
+	
+	output[3].Position = float4(arrBasePos[3], 0, 1);
+	output[3].UV = arrUV[3];
+	output[3].Index = gIn[0].vIndex;
+	triStream.Append(output[3]);
+	output[4].Position = float4(arrBasePos[2], 0, 1);
+	output[4].UV = arrUV[2];
+	output[4].Index = gIn[0].vIndex;
+	triStream.Append(output[4]);
+	output[5].Position = float4(arrBasePos[0], 0, 1);
+	output[5].UV = arrUV[0];
+	output[5].Index = gIn[0].vIndex;
+	triStream.Append(output[5]);
+	
+	triStream.RestartStrip();
+}
+
+half4 TerrainCombineNoisePS(TerrainCombineNoiseGS_Output In) : SV_TARGET
+{
+	half4 finalColor = texHighPitchNoise.SampleLevel(noiseVolumeSampler, float3(In.UV.xy, In.Index / g_VoxelSize), 0);
+	finalColor = (finalColor + 1) * 0.5f;
+	finalColor = half4(0,0,0,finalColor.y);
+	return finalColor;
+}
+
+technique11 TerrainVoxel
 {
 	pass p0
 	{
-		SetVertexShader(CompileShader(vs_5_0, VS()));
-		SetGeometryShader(CompileShader(gs_5_0, GS()));
-		SetPixelShader(CompileShader(ps_5_0, PS()));
+		SetVertexShader(CompileShader(vs_5_0, TerrainVoxelVS()));
+		SetGeometryShader(CompileShader(gs_5_0, TerrainVoxelGS()));
+		SetPixelShader(CompileShader(ps_5_0, TerrainVoxelPS()));
 		
 		SetBlendState( NoBlend, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
 		SetRasterizerState(CCW);
 		SetDepthStencilState(UseDepth, 0);
+	}
+}
+
+technique11 TerrainCombineNoise
+{
+	pass p0
+	{
+		SetVertexShader(CompileShader(vs_5_0, TerrainCombineNoiseVS()));
+		SetGeometryShader(CompileShader(gs_5_0, TerrainCombineNoiseGS()));
+		SetPixelShader(CompileShader(ps_5_0, TerrainCombineNoisePS()));
+		
+		SetBlendState( NoBlend, float4( 0.0f, 0.0f, 0.0f, 0.0f ), 0xFFFFFFFF );
+		SetRasterizerState(CCW);
+		SetDepthStencilState(NoUseDepth, 0);
 	}
 }

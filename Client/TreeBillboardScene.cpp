@@ -73,7 +73,7 @@ int TreeBillboardScene::Render()
 
 	RenderDevice::This().Begin(&RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BACKBUFFER)->m_pRenderTargetView, 1);
 	{
-		RenderDevice::This().Begin("HorizonBlur", 0);
+		RenderDevice::This().BeginFX("HorizonBlur", 0);
 		{
 			RenderDevice::This().GetRawVariableByName("gInput")->AsShaderResource()->SetResource(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BACKBUFFER_TEMP)->m_pResourceView);
 			RenderDevice::This().GetRawVariableByName("gOutput")->AsUnorderedAccessView()->SetUnorderedAccessView(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BLUR)->m_pUnorderdView);
@@ -87,9 +87,9 @@ int TreeBillboardScene::Render()
 			ID3D11UnorderedAccessView* nullSUV[1] = { 0 };
 			RenderDevice::This().GetContext()->CSSetUnorderedAccessViews(0, 1, nullSUV, 0);
 		}
-		RenderDevice::This().End("HorizonBlur");
+		RenderDevice::This().EndFX();
 
-		RenderDevice::This().Begin("VerticalBlur", 0);
+		RenderDevice::This().BeginFX("VerticalBlur", 0);
 		{
 			RenderDevice::This().GetRawVariableByName("gInput")->AsShaderResource()->SetResource(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BLUR)->m_pResourceView);
 			RenderDevice::This().GetRawVariableByName("gOutput")->AsUnorderedAccessView()->SetUnorderedAccessView(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BACKBUFFER_TEMP)->m_pUnorderdView);
@@ -103,7 +103,7 @@ int TreeBillboardScene::Render()
 			ID3D11UnorderedAccessView* nullSUV[1] = { 0 };
 			RenderDevice::This().GetContext()->CSSetUnorderedAccessViews(0, 1, nullSUV, 0);
 		}
-		RenderDevice::This().End("VerticalBlur");
+		RenderDevice::This().EndFX();
 
 		RenderDevice::This().GetContext()->CSSetShader(0, 0, 0);
 

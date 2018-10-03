@@ -65,7 +65,7 @@ int TestCalcShaderScene::Update()
 	Texture* pTextureB = TextureManager::This().CreateInputBufferTexture<ClacData>(&dataB[0], 10);
 	Texture* pTextureC = TextureManager::This().CreateOutputBufferTexture<ClacData>(&dataC[0], 10);
 
-	RenderDevice::This().Begin("testcalc");
+	RenderDevice::This().BeginFX();
 	{
 		HRESULT hr;
 		hr = RenderDevice::This().GetRawVariableByName("gInputA")->AsShaderResource()->SetResource(pTextureA->m_pResourceView);
@@ -81,7 +81,7 @@ int TestCalcShaderScene::Update()
 
 	//끝까지 돌리면안됨 수정할거많음~
 
-	RenderDevice::This().End();
+	RenderDevice::This().EndFX();
 
 	return 0;
 }

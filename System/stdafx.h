@@ -20,5 +20,6 @@
 #include "../CommonUtil/CommonDefine.h"
 #include "../CommonUtil/Math.h"
 #include "DirectXMath.h"
+#include "Math.h"
 #include <vector>
 #include <string>

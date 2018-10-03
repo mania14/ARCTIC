@@ -306,7 +306,7 @@ void ToolTransformManager::CreateGizmo()
 
 void ToolTransformManager::RenderGizmo(Transform* pTransform)
 {
-	RenderDevice::This().Begin("DebugTech");
+	RenderDevice::This().BeginFX("DebugTech");
 	{
 		// Draw Line
 		UINT stride = sizeof(Vertex_Debug);
@@ -333,19 +333,19 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 			float4x4 worldviewproj = matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Z], 0, sizeof(float3));
-			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+			RenderDevice::This().ApplyFX();
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
 			worldviewproj = MakeRotateMatrix(float3(0, DEGREE_TO_RADIAN * 90, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_X], 0, sizeof(float3));
-			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+			RenderDevice::This().ApplyFX();
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 
 			worldviewproj = MakeRotateMatrix(float3(DEGREE_TO_RADIAN * -90, 0, 0)) * matPosition * CameraManager::This().GetCurrentCameraViewProj();
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&AxisColor[TOOL_TRANSFORM_AXIS_Y], 0, sizeof(float3));
-			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+			RenderDevice::This().ApplyFX();
 			RenderDevice::This().GetContext()->Draw((_pGizmo->LineGizmoCount), 0);
 		}
 
@@ -404,7 +404,7 @@ void ToolTransformManager::RenderGizmo(Transform* pTransform)
 		//	RenderDevice::This().GetContext()->Draw(_pGizmo->ScaleGizmoCount, 0);
 		//}
 	}
-	RenderDevice::This().End("DebugTech");
+	RenderDevice::This().EndFX();
 
 	RenderDevice::This().GetContext()->OMSetDepthStencilState(0, 0);
 }

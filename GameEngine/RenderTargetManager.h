@@ -1,7 +1,7 @@
 #pragma once
 #include "../CommonUtil/Singletone.h"
 #include <vector>
-#include "../GameEngine/Texture.h"
+#include "../System/Texture.h"
 #include "../System/VertexDesc.h"
 
 struct MeshBuffer;

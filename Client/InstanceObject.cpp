@@ -34,12 +34,12 @@ void InstanceObject::Create()
 	AddComponent(pMesh);
 
 	Instancing* pInstance = new Instancing();
-	MeshFactory::This().CreateInstance(*pMesh, *pInstance);
+	//MeshFactory::This().CreateInstance(*pInstance);
 	AddComponent(pInstance);
 
 	//ÅØ½ºÃÄ
-	Texture* pTexture = TextureManager::This().LoadTexture("../Res/Texture/WireFence.dds");
-	AddComponent(pTexture);
+	//Texture* pTexture = TextureManager::This().LoadTexture("../Res/Texture/WireFence.dds");
+	//AddComponent(pTexture);
 
 }
 
@@ -55,7 +55,7 @@ void InstanceObject::Render()
 
 	Mesh* pMesh = GetComponent<Mesh>();
 	Transform* pTransform = GetComponent<Transform>();
-	Texture* pTexture = GetComponent<Texture>();
+	//Texture* pTexture = GetComponent<Texture>();
 	Instancing* pInstancing = GetComponent<Instancing>();
 
 	float4x4 worldViewProj = pTransform->GetWorldMatrix() * CameraManager::This().GetCurrentCameraViewProj();
@@ -65,7 +65,7 @@ void InstanceObject::Render()
 	worldInvTranspose.transpose();
 
 
-	RenderDevice::This().Begin("defaultlight");
+	RenderDevice::This().BeginFX("defaultlight");
 	{
 		//ºû
 		//LightManager::This().Update();
@@ -103,7 +103,7 @@ void InstanceObject::Render()
 		RenderDevice::This().GetContext()->IASetIndexBuffer(pMesh->GetMeshBuffer()->vIBuffer, DXGI_FORMAT_R32_UINT, 0);
 		RenderDevice::This().GetContext()->DrawIndexedInstanced((int)pMesh->GetIndicsCount(), 100, 0, 0, 0);
 	}
-	RenderDevice::This().End("deafaultlight");
+	RenderDevice::This().EndFX();
 
 }
 

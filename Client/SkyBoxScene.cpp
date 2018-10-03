@@ -17,6 +17,7 @@
 #include "../GameEngine/PickingManager.h"
 #include "ToolTransformManager.h"
 #include "../GameEngine/TerrainMakerManager.h"
+#include "SceneTerrainManager.h"
 
 SkyBoxScene::SkyBoxScene()
 {
@@ -89,9 +90,9 @@ int SkyBoxScene::Render()
 	//mesh render
 	{
 		RenderTargetDesc rtDesc;
-		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_COLOR)->m_pRenderTargetView);
-		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_NORMAL)->m_pRenderTargetView);
-		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_SPECPOWER)->m_pRenderTargetView);
+		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_COLOR));
+		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_NORMAL));
+		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_SPECPOWER));
 		rtDesc._DepthType = eRTDT_USE_DEPTH;
 
 		RenderDevice::This().Begin(rtDesc);
@@ -101,13 +102,13 @@ int SkyBoxScene::Render()
 			ToolTransformManager::This().Render();
 			//TerrainMakerManager::This().Render();
 		}
-		RenderDevice::This().End(rtDesc);
+		RenderDevice::This().End();
 	}
 
 	//lighting
 	{
 		RenderTargetDesc rtDesc;
-		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BACKBUFFER)->m_pRenderTargetView);
+		rtDesc._RenderTargetList.push_back(RenderTargetManager::This().GetRenderTarget(RenderTargetManager::eRT_BACKBUFFER));
 		rtDesc._DepthType = eRTDT_USE_READONLY_DEPTH;
 
 		RenderDevice::This().Begin(rtDesc);
@@ -116,7 +117,7 @@ int SkyBoxScene::Render()
 			LightManager::This().Render();
 			RenderDevice::This().SetRenderState(eRS_DEFAUT);
 		}
-		RenderDevice::This().End(rtDesc);
+		RenderDevice::This().End();
 	}
 
 	return 0;

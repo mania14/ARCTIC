@@ -29,6 +29,8 @@ void RenderTargetManager::Init()
 
 	Texture* pBackBuffer = new Texture();
 	pBackBuffer->m_pRenderTargetView = RenderDevice::This().GetBackBufferRenderTarget();
+	pBackBuffer->m_TextureSize.x = width;
+	pBackBuffer->m_TextureSize.y = height;
 	pBackBuffer->m_pRenderTargetView->AddRef();
 
 	_RenderTargetList[eRT_BACKBUFFER] = pBackBuffer;
@@ -110,13 +112,13 @@ void RenderTargetManager::DrawScreenQuadRaw()
 	RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &_ScreenQuadBuffer->vBuffer, &stride, &offset);
 	RenderDevice::This().GetContext()->IASetIndexBuffer(_ScreenQuadBuffer->vIBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+	RenderDevice::This().ApplyFX();
 	RenderDevice::This().GetContext()->DrawIndexed(6, 0, 0);
 }
 
 void RenderTargetManager::DrawScreenQuad()
 {
-	RenderDevice::This().Begin("UnPackGBufferTech", 0);
+	RenderDevice::This().BeginFX("UnPackGBufferTech", 0);
 
 	RenderDevice::This().GetRawVariableByName("gDepthTex")->AsShaderResource()->SetResource(RenderDevice::This().GetDepthStencilResourceView());
 	RenderDevice::This().GetRawVariableByName("gColorTex")->AsShaderResource()->SetResource(_RenderTargetList[RenderTargetManager::eRT_COLOR]->m_pResourceView);
@@ -137,14 +139,14 @@ void RenderTargetManager::DrawScreenQuad()
 	RenderDevice::This().GetContext()->IASetInputLayout(NULL);
 	RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	RenderDevice::This().GetContext()->IASetVertexBuffers(0, 0, nullptr, 0, 0);
-	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+	RenderDevice::This().ApplyFX();
 	RenderDevice::This().GetContext()->Draw(4, 0);
 
 	RenderDevice::This().GetRawVariableByName("gDepthTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gColorTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gNormalTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gSpecTex")->AsShaderResource()->SetResource(NULL);
-	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+	RenderDevice::This().ApplyFX();
 
-	RenderDevice::This().End("UnPackGBufferTech");
+	RenderDevice::This().EndFX();
 }

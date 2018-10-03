@@ -3,6 +3,7 @@
 #include "../CommonUtil/Math.h"
 #include "MeshFactory.h"
 #include "Mesh.h"
+#include "Instancing.h"
 #include "Billboard.h"
 #include "directxcolors.h"
 #include "TextureManager.h"
@@ -228,19 +229,20 @@ bool MeshFactory::CreateBillboard(Billboard & _billboardData, std::vector<Vertex
 	return true;
 }
 
-bool MeshFactory::CreateInstance(Mesh& meshData, Instancing & pInstance)
+bool MeshFactory::CreateInstance(Instancing & pInstance, UINT byteWidth, void* pData)
 {
-	meshData.Init();
+	D3D11_BUFFER_DESC vBufferDesc;
+	vBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vBufferDesc.ByteWidth = byteWidth;
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
+	vBufferDesc.StructureByteStride = 0;
 
-	D3D11_BUFFER_DESC InsBuffer;
-	InsBuffer.Usage = D3D11_USAGE_DYNAMIC;
-	InsBuffer.ByteWidth = sizeof(Vertex_Instance) * 100;
-	InsBuffer.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	InsBuffer.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	InsBuffer.MiscFlags = 0;
-	InsBuffer.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA vInitData;
+	vInitData.pSysMem = &pData;
 
-	//RenderDevice::This().GetDevice()->CreateBuffer(&InsBuffer, 0, )
+	RenderDevice::This().GetDevice()->CreateBuffer(&vBufferDesc, 0, &pInstance.vBuffer);
 
 	return false;
 }
@@ -686,7 +688,7 @@ void MeshFactory::ConvertFBXMesh(Mesh* meshData, FbxNode* fbNode)
 
 	if (materialCount > 0)
 	{
-		meshData->pTexture[Mesh::TEXTURE_TYPE_DIFFUSE] = TextureManager::This().LoadTexture2DArray(meshData->meshFilename, vecTextureName);
+		meshData->pTexture[Mesh::TEXTURE_SLOT0] = TextureManager::This().LoadTexture2DArray(meshData->meshFilename, vecTextureName);
 	}
 
 	if (currMesh != nullptr)

@@ -6,7 +6,6 @@
 #include "../GameEngine/MeshFactory.h"
 #include "../GameEngine/Mesh.h"
 #include "../GameEngine/TextureManager.h"
-#include "../GameEngine/Texture.h"
 
 //지우자
 #include "../GameEngine/LightManager.h"
@@ -33,12 +32,9 @@ void SkyBox::Create()
 	//메쉬
 	Mesh* pMesh = new Mesh();
 	MeshFactory::This().CreateGeoSphere(1, 2, *pMesh);
+	pMesh->SetTexture(Mesh::TEXTURE_SLOT0, TextureManager::This().LoadTexture("../Res/Texture/SkyBox.dds"));
+
 	AddComponent(pMesh);
-
-	//텍스쳐
-	Texture* pTexture = TextureManager::This().LoadTexture("../Res/Texture/SkyBox.dds");
-	AddComponent(pTexture);
-
 }
 
 void SkyBox::Update()
@@ -50,7 +46,6 @@ void SkyBox::Render()
 {
 	Mesh* pMesh = GetComponent<Mesh>();
 	Transform* pTransform = GetComponent<Transform>();
-	Texture* pTexture = GetComponent<Texture>();
 
 	float4x4 rotateView = CameraManager::This().GetCurrentCameraView();
 	rotateView._41 = 0.f; rotateView._42 = 0.f; rotateView._43 = 0.f; rotateView._44 = 1.f;
@@ -58,7 +53,7 @@ void SkyBox::Render()
 	float4x4 worldViewProj = rotateView * CameraManager::This().GetCurrentCameraProj();
 
 
-	RenderDevice::This().Begin("SkyTech");
+	RenderDevice::This().BeginFX("SkyTech");
 	{
 		UINT stride = pMesh->GetVertexSize();
 		UINT offset = 0;
@@ -68,15 +63,17 @@ void SkyBox::Render()
 		hr = RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldViewProj));
 
 		//텍스쳐		
-		hr = RenderDevice::This().GetRawVariableByName("gCubeMap")->AsShaderResource()->SetResource(pTexture->m_pResourceView);
+		hr = RenderDevice::This().GetRawVariableByName("gCubeMap")->AsShaderResource()->SetResource(pMesh->GetTexture(Mesh::TEXTURE_SLOT0)->m_pResourceView);
 
-		RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+		RenderDevice::This().ApplyFX();
 
 		RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &pMesh->GetMeshBuffer()->vBuffer, &stride, &offset);
 		RenderDevice::This().GetContext()->IASetIndexBuffer(pMesh->GetMeshBuffer()->vIBuffer, DXGI_FORMAT_R32_UINT, 0);
 		RenderDevice::This().GetContext()->DrawIndexed((int)pMesh->GetIndicsCount(), 0, 0);
+
+		RenderDevice::This().GetRawVariableByName("gCubeMap")->AsShaderResource()->SetResource(nullptr);
 	}
-	RenderDevice::This().End("SkyTech");
+	RenderDevice::This().EndFX();
 
 }
 

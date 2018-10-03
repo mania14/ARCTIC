@@ -27,6 +27,11 @@ int Mesh::Init()
 	return false;
 }
 
+void Mesh::SetTexture(TextureType textureSlotNum, Texture* pTex)
+{
+	pTexture[textureSlotNum] = pTex;
+}
+
 void Mesh::Draw()
 {
 	UINT stride = GetVertexSize();
@@ -36,19 +41,19 @@ void Mesh::Draw()
 	//RenderDevice::This().GetRawVariableByName("gMaterial")->SetRawValue(pMaterial, 0, sizeof(Material));
 
 	//Texture
-	if(nullptr != pTexture[Mesh::TEXTURE_TYPE_DIFFUSE])
+	if(nullptr != pTexture[Mesh::TEXTURE_SLOT0])
 	{
-		RenderDevice::This().GetRawVariableByName("gDiffuseMap")->AsShaderResource()->SetResource(pTexture[Mesh::TEXTURE_TYPE_DIFFUSE]->m_pResourceView);
+		RenderDevice::This().GetRawVariableByName("gDiffuseMap")->AsShaderResource()->SetResource(pTexture[Mesh::TEXTURE_SLOT0]->m_pResourceView);
 	}
 
-	if (nullptr != pTexture[Mesh::TEXTURE_TYPE_NORMAL])
+	if (nullptr != pTexture[Mesh::TEXTURE_SLOT1])
 	{
-		RenderDevice::This().GetRawVariableByName("gNormalMap")->AsShaderResource()->SetResource(pTexture[Mesh::TEXTURE_TYPE_NORMAL]->m_pResourceView);
+		RenderDevice::This().GetRawVariableByName("gNormalMap")->AsShaderResource()->SetResource(pTexture[Mesh::TEXTURE_SLOT1]->m_pResourceView);
 	}
 
 	if( GetMeshBuffer()->vBuffer != nullptr && GetMeshBuffer()->vIBuffer != nullptr )
 	{
-		RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+		RenderDevice::This().ApplyFX();
 		RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &GetMeshBuffer()->vBuffer, &stride, &offset);
 		RenderDevice::This().GetContext()->IASetIndexBuffer(GetMeshBuffer()->vIBuffer, DXGI_FORMAT_R32_UINT, 0);
 		RenderDevice::This().GetContext()->DrawIndexed((int)GetIndicsCount(), 0, 0);

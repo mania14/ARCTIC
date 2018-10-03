@@ -52,7 +52,7 @@ void Terrain::Update()
 void Terrain::Render()
 {
 	TerrainVoxel* pTerrainVoxel = GetComponent<TerrainVoxel>();
-	pTerrainVoxel->TestRender();
+	pTerrainVoxel->Render();
 
 	//Mesh* pMesh = GetComponent<Mesh>();
 	//Transform* pTransform = GetComponent<Transform>();

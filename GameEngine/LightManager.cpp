@@ -31,7 +31,7 @@ void LightManager::SetDirectinalLightConstBuffer()
 
 void LightManager::Render()
 {
-	RenderDevice::This().Begin("LightDefaultTech", 0);
+	RenderDevice::This().BeginFX("LightDefaultTech", 0);
 
 	SetDirectinalLightConstBuffer();
 
@@ -56,18 +56,15 @@ void LightManager::Render()
 
 	acm::float4x4 invView = CameraManager::This().GetCurrentCamera()->GetView().inverse_val();
 	RenderDevice::This().GetVariableByName("ViewInv")->SetMatrix(reinterpret_cast<float*>(&invView));
+	RenderDevice::This().ApplyFX();
 
-	RenderDevice::This().GetContext()->IASetInputLayout(NULL);
-	RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	RenderDevice::This().GetContext()->IASetVertexBuffers(0, 0, nullptr, 0, 0);
-	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
-	RenderDevice::This().GetContext()->Draw(4, 0);
+	RenderDevice::This().DrawQuad();
 
 	RenderDevice::This().GetRawVariableByName("gDepthTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gColorTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gNormalTex")->AsShaderResource()->SetResource(NULL);
 	RenderDevice::This().GetRawVariableByName("gSpecTex")->AsShaderResource()->SetResource(NULL);
-	RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+	RenderDevice::This().ApplyFX();
 
-	RenderDevice::This().End("LightDefaultTech");
+	RenderDevice::This().EndFX();
 }

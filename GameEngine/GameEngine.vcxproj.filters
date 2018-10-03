@@ -84,9 +84,6 @@
     <ClInclude Include="TextureManager.h">
       <Filter>소스 파일\EngineComponentFactory</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>소스 파일\EngineComponent</Filter>
-    </ClInclude>
     <ClInclude Include="Billboard.h">
       <Filter>소스 파일\EngineComponent</Filter>
     </ClInclude>
@@ -172,9 +169,6 @@
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>소스 파일\EngineComponentFactory</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>소스 파일\EngineComponent</Filter>
     </ClCompile>
     <ClCompile Include="Billboard.cpp">
       <Filter>소스 파일\EngineComponent</Filter>

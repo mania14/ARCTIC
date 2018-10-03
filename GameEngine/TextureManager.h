@@ -2,8 +2,7 @@
 #include "../System/RenderDevice.h"
 #include "../System/DDSTextureLoader.h"
 #include "../System/WICTextureLoader.h"
-
-class Texture;
+#include "../System/Texture.h"
 
 enum TextureUsage
 {
@@ -20,7 +19,7 @@ public:
 	Texture* LoadTexture(std::string strFileName);
 	Texture* LoadTexture2DArray(std::string textureSetName, std::vector<std::string>& filenames);
 	Texture* CreateRenderTargetTexture(UINT width, UINT height, DXGI_FORMAT format, UINT BindFlags);
-	Texture* CreateVolumeTexture(UINT width, UINT height, UINT depth, UINT BindFlags, void* pData);
+	Texture* CreateVolumeTexture(UINT width, UINT height, UINT depth, DXGI_FORMAT format, UINT BindFlags, void* pData);
 	Texture* CreateNoiseTexture(UINT width, UINT height);
 
 	template<class BufferType>

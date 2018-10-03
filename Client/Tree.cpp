@@ -6,7 +6,7 @@
 #include "../GameEngine/MeshFactory.h"
 #include "../GameEngine/Billboard.h"
 #include "../GameEngine/TextureManager.h"
-#include "../GameEngine/Texture.h"
+#include "../System/Texture.h"
 #include "../System/RenderState.h"
 
 //지우자
@@ -47,16 +47,16 @@ void Tree::Create()
 	//텍스쳐
 	//Texture* pTexture = TextureManager::This().LoadTexture("../Res/Texture/Test.dds");
 
-	std::vector<std::string> filenames
-	{
-		"../Res/Texture/tree0.dds",
-		"../Res/Texture/tree1.dds",
-		"../Res/Texture/tree2.dds",
-		"../Res/Texture/tree3.dds"
-	};
+	//std::vector<std::string> filenames
+	//{
+	//	"../Res/Texture/tree0.dds",
+	//	"../Res/Texture/tree1.dds",
+	//	"../Res/Texture/tree2.dds",
+	//	"../Res/Texture/tree3.dds"
+	//};
 
-	Texture* pTexture = TextureManager::This().LoadTexture2DArray("Tree", filenames);
-	AddComponent(pTexture);
+	//Texture* pTexture = TextureManager::This().LoadTexture2DArray("Tree", filenames);
+	//AddComponent(pTexture);
 
 }
 
@@ -69,11 +69,11 @@ void Tree::Render()
 {
 	Billboard* pBillboard = GetComponent<Billboard>();
 	Transform* pTransform = GetComponent<Transform>();
-	Texture* pTexture = GetComponent<Texture>();
+	//Texture* pTexture = GetComponent<Texture>();
 
 	float4x4 ViewProj = CameraManager::This().GetCurrentCameraViewProj();
 
-	RenderDevice::This().Begin("LightBillboardTech");
+	RenderDevice::This().BeginFX("LightBillboardTech");
 	{
 		RenderDevice::This().GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 		UINT stride = pBillboard->GetVertexSize();
@@ -95,9 +95,9 @@ void Tree::Render()
 		RenderDevice::This().GetRawVariableByName("gMaterial")->SetRawValue(&mLandMat, 0, sizeof(mLandMat));
 
 		//텍스쳐		
-		hr = RenderDevice::This().GetRawVariableByName("gDiffuseMap")->AsShaderResource()->SetResource(pTexture->m_pResourceView);
+		//hr = RenderDevice::This().GetRawVariableByName("gDiffuseMap")->AsShaderResource()->SetResource(pTexture->m_pResourceView);
 
-		RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+		RenderDevice::This().ApplyFX();
 
 		//알파 포괄도
 		RenderDevice::This().GetContext()->OMSetBlendState(RenderStates::This().AlphaToCoverageBS, blendFactor, 0xffffffff);
@@ -106,7 +106,7 @@ void Tree::Render()
 		RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &pBuffer, &stride, &offset);
 		RenderDevice::This().GetContext()->Draw((int)pBillboard->GetVertexCount(), 0);
 	}
-	RenderDevice::This().End("LightBillboardTech");
+	RenderDevice::This().EndFX();
 
 }
 

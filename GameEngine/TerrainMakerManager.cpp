@@ -589,11 +589,11 @@ void TerrainMakerManager::MakeHeightMap(int x, int y, std::string filename)
 	Texture* pRenderTexture = TextureManager::This().CreateRenderTargetTexture(512, 512, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	//RenderDevice::This().Begin(&pRenderTexture->m_pRenderTargetView, 1);
 	{
-		RenderDevice::This().Begin("PerlinNoise", 0);
+		RenderDevice::This().BeginFX("PerlinNoise", 0);
 		{
 			RenderTargetManager::This().DrawScreenQuadRaw();
 		}
-		RenderDevice::This().End("PerlinNoise");
+		RenderDevice::This().EndFX();
 	}
 	//RenderDevice::This().End(&pRenderTexture->m_pRenderTargetView, 1);
 

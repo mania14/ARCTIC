@@ -8,7 +8,6 @@
 #include "../System/RenderDevice.h"
 #include "../System/DDSTextureLoader.h"
 #include "../System/ScreenGrab.h"
-#include "Texture.h"
 
 void TextureManager::SaveTextureFile(Texture * pTex)
 {
@@ -46,6 +45,19 @@ Texture * TextureManager::LoadTexture(std::string strFileName)
 	{
 		HR(CreateWICTextureFromFile(RenderDevice::This().GetDevice(), Multi2Wide(strFileName.c_str()).c_str(), 0, &(pTexture->m_pResourceView)), L"CreateWICTextureFromFile Fail");
 	}
+
+	ID3D11Resource* res;
+	ID3D11Texture2D* pTextureInterface = 0;
+	D3D11_TEXTURE2D_DESC desc;
+	pTexture->m_pResourceView->GetResource(&res);
+	res->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
+	pTextureInterface->GetDesc(&desc);
+
+	pTexture->m_TextureSize.x = desc.Width;
+	pTexture->m_TextureSize.y = desc.Height;
+
+	pTextureInterface->Release();
+	res->Release();
 
 	return pTexture;
 }
@@ -225,12 +237,13 @@ Texture * TextureManager::CreateRenderTargetTexture(UINT width, UINT height, DXG
 		}
 	}
 
-	renderTargetTex->Release();
+	pTexture->m_TextureSize.x = width;
+	pTexture->m_TextureSize.y = height;
 
 	return pTexture;
 }
 
-Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT depth, UINT BindFlags, void* pData)
+Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT depth, DXGI_FORMAT format, UINT BindFlags, void* pData)
 {
 	D3D11_TEXTURE3D_DESC texDesc;
 
@@ -241,7 +254,7 @@ Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT dept
 	texDesc.Height = height;
 	texDesc.Depth = depth;
 	texDesc.MipLevels = 1;
-	texDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	texDesc.Format = format;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = BindFlags; //D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	texDesc.CPUAccessFlags = 0;
@@ -265,11 +278,11 @@ Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT dept
 	if (texDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
 	{
 		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-		rtvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		rtvDesc.Format = format;
 		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
 		rtvDesc.Texture3D.MipSlice = 0;
 		rtvDesc.Texture3D.FirstWSlice = 0;
-		rtvDesc.Texture3D.WSize = 0;
+		rtvDesc.Texture3D.WSize = -1;
 
 		if (FAILED(RenderDevice::This().GetDevice()->CreateRenderTargetView(vaolumeTex, &rtvDesc, &pTexture->m_pRenderTargetView)))
 		{
@@ -285,7 +298,7 @@ Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT dept
 	if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		srvDesc.Format = format;
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
 		srvDesc.Texture3D.MostDetailedMip = 0;
 		srvDesc.Texture3D.MipLevels = 1;
@@ -303,7 +316,7 @@ Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT dept
 	if (texDesc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
 	{
 		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-		uavDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		uavDesc.Format = format;
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
 		uavDesc.Texture3D.MipSlice = 0;
 		uavDesc.Texture3D.FirstWSlice = 0;
@@ -318,6 +331,10 @@ Texture * TextureManager::CreateVolumeTexture(UINT width, UINT height, UINT dept
 			return nullptr;
 		}
 	}
+
+	pTexture->m_TextureSize.x = width;
+	pTexture->m_TextureSize.y = height;
+	pTexture->m_TextureSize.z = depth;
 
 	return pTexture;
 }

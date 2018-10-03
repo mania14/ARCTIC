@@ -236,7 +236,7 @@ void Transform::RenderBox()
 	RenderDevice::This().GetDevice()->CreateBuffer(&bd, &InitData, &pBuffer);
 	
 
-	RenderDevice::This().Begin("DebugTech");
+	RenderDevice::This().BeginFX("DebugTech");
 	{
 		// Draw Line
 		UINT stride = sizeof(Vertex_Debug);
@@ -251,11 +251,11 @@ void Transform::RenderBox()
 			RenderDevice::This().GetVariableByName("gWorldViewProj")->SetMatrix(reinterpret_cast<float*>(&worldviewproj));
 			RenderDevice::This().GetRawVariableByName("gColor")->AsVector()->SetRawValue(&color, 0, sizeof(float3));
 			RenderDevice::This().GetContext()->IASetVertexBuffers(0, 1, &(pBuffer), &stride, &offset);
-			RenderDevice::This().GetPassByIndex(0)->Apply(0, RenderDevice::This().GetContext());
+			RenderDevice::This().ApplyFX();
 			RenderDevice::This().GetContext()->Draw((Count), 0);
 		}
 	}
-	RenderDevice::This().End("DebugTech");
+	RenderDevice::This().EndFX();
 
 	pBuffer->Release();
 }
